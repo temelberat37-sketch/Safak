@@ -24,10 +24,20 @@ h1 {
   margin-top: 10px;
 }
 
+#isim {
+  font-size: 20px;
+  opacity: 0.8;
+}
+
 #safak {
   font-size: 120px;
   font-weight: bold;
   margin: 20px 0;
+}
+
+#atarsa {
+  font-size: 20px;
+  margin-bottom: 20px;
 }
 
 .card {
@@ -55,22 +65,6 @@ h1 {
   width: 0%;
 }
 
-input {
-  padding: 10px;
-  margin: 5px;
-  border-radius: 10px;
-  border: none;
-}
-
-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 10px;
-  background: #007bff;
-  color: white;
-  cursor: pointer;
-}
-
 </style>
 </head>
 
@@ -78,66 +72,66 @@ button {
 
 <div class="overlay">
 
-<h1>Şafak Sayar</h1>
+<h1>Şafak Sayar 2026</h1>
+<div id="isim">Berat</div>
 
-<!-- Giriş -->
-<div>
-  <input type="date" id="baslangic">
-  <input type="number" id="gun" placeholder="Toplam Gün (örn: 180)">
-  <button onclick="hesapla()">Hesapla</button>
-</div>
+<div id="safak">...</div>
+<div id="atarsa"></div>
 
-<!-- Şafak -->
-<div id="safak">---</div>
-<div id="mesaj"></div>
-
-<!-- Kartlar -->
 <div>
   <div class="card">
     <h3>Kalan Süre</h3>
-    <p id="kalan">0 Gün</p>
+    <p id="kalan"></p>
   </div>
 
   <div class="card">
     <h3>Geçen Süre</h3>
-    <p id="gecen">0 Gün</p>
+    <p id="gecen"></p>
   </div>
 </div>
 
-<!-- Progress -->
 <div class="progress">
   <div class="progress-bar" id="bar"></div>
 </div>
 
-<div id="oran">%0</div>
+<div id="oran"></div>
 
 </div>
 
 <script>
 
-function hesapla() {
+// SABİT BİLGİLER
+const baslangic = new Date("2026-02-05");
+const toplamGun = 180; // 6 ay
+const kullanilanIzin = 3;
 
-  const baslangic = new Date(document.getElementById("baslangic").value);
-  const toplamGun = parseInt(document.getElementById("gun").value);
+// TERHİS HESABI
+const toplamGercekGun = toplamGun - kullanilanIzin;
+
+function hesapla() {
 
   const bugun = new Date();
 
   const gecenGun = Math.floor((bugun - baslangic) / (1000*60*60*24));
-  const kalanGun = toplamGun - gecenGun;
+  const kalanGun = toplamGercekGun - gecenGun;
 
-  const yuzde = (gecenGun / toplamGun) * 100;
+  const yuzde = (gecenGun / toplamGercekGun) * 100;
 
   document.getElementById("safak").innerText = kalanGun;
+  document.getElementById("atarsa").innerText = "Atarsa " + (kalanGun - 1);
+
   document.getElementById("kalan").innerText = kalanGun + " Gün";
   document.getElementById("gecen").innerText = gecenGun + " Gün";
-  document.getElementById("oran").innerText = "%" + yuzde.toFixed(1);
+
+  document.getElementById("oran").innerText = "%" + yuzde.toFixed(1) + " tamamlandı";
 
   document.getElementById("bar").style.width = yuzde + "%";
-
-  document.getElementById("mesaj").innerText = "Atarsa " + (kalanGun - 1);
 }
 
-// Sayfa açılınca otomatik hesaplasın
+// SAYFA AÇILINCA ÇALIŞ
+hesapla();
+
+// HER DAKİKA GÜNCELLE
 setInterval(hesapla, 60000);
 
 </script>
