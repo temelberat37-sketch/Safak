@@ -1,1 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Şafak Sayar</title>
 
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: white;
+  text-align: center;
+}
+
+.container {
+  padding: 20px;
+}
+
+h1 {
+  margin-top: 10px;
+  font-size: 22px;
+  opacity: 0.9;
+}
+
+#isim {
+  font-size: 18px;
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+#safak {
+  font-size: 110px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+#atarsa {
+  font-size: 18px;
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+#terhis {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: #ffd166;
+}
+
+.cards {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.card {
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  padding: 15px;
+  width: 40%;
+  backdrop-filter: blur(10px);
+}
+
+.card h3 {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.card p {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.progress {
+  width: 90%;
+  height: 18px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  margin: 20px auto;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  width: 0%;
+  transition: 0.5s;
+}
+
+#oran {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Şafak Sayar 2026</h1>
+<div id="isim">Berat</div>
+
+<div id="safak">...</div>
+<div id="atarsa"></div>
+<div id="terhis"></div>
+
+<div class="cards">
+  <div class="card">
+    <h3>Kalan Süre</h3>
+    <p id="kalan"></p>
+  </div>
+
+  <div class="card">
+    <h3>Geçen Süre</h3>
+    <p id="gecen"></p>
+  </div>
+</div>
+
+<div class="progress">
+  <div class="progress-bar" id="bar"></div>
+</div>
+
+<div id="oran"></div>
+
+</div>
+
+<script>
+
+// SABİT BİLGİLER
+const baslangic = new Date("2026-02-05");
+const toplamGun = 180;
+const kullanilanIzin = 3;
+
+// GERÇEK GÜN
+const toplamGercekGun = toplamGun - kullanilanIzin;
+
+// TERHİS TARİHİ HESAPLA
+const terhis = new Date(baslangic);
+terhis.setDate(terhis.getDate() + toplamGercekGun);
+
+function formatTarih(tarih) {
+  return tarih.toLocaleDateString("tr-TR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function hesapla() {
+
+  const bugun = new Date();
+
+  const gecenGun = Math.floor((bugun - baslangic) / (1000*60*60*24));
+  const kalanGun = toplamGercekGun - gecenGun;
+
+  const yuzde = (gecenGun / toplamGercekGun) * 100;
+
+  document.getElementById("safak").innerText = kalanGun;
+  document.getElementById("atarsa").innerText = "Atarsa " + (kalanGun - 1);
+
+  document.getElementById("kalan").innerText = kalanGun + " Gün";
+  document.getElementById("gecen").innerText = gecenGun + " Gün";
+
+  document.getElementById("oran").innerText = "%" + yuzde.toFixed(1) + " tamamlandı";
+
+  document.getElementById("bar").style.width = yuzde + "%";
+
+  document.getElementById("terhis").innerText = "Terhis: " + formatTarih(terhis);
+}
+
+// ÇALIŞTIR
+hesapla();
+setInterval(hesapla, 60000);
+
+</script>
+
+</body>
+  </html>
