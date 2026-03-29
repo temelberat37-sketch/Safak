@@ -18,6 +18,140 @@ body {
   padding: 20px;
 }
 
+#safak {
+  font-size: 100px;
+  font-weight: bold;
+}
+
+.progress {
+  width: 90%;
+  height: 18px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  margin: 20px auto;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #00c6ff;
+  width: 0%;
+}
+
+.geri {
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  border-radius: 15px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.geri h3 {
+  color: #ff4d4d;
+}
+
+.ok {
+  color: #4caf50;
+}
+
+.kaldi {
+  color: #ff4d4d;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Berat</h2>
+
+<div id="safak">...</div>
+<div id="atarsa"></div>
+
+<div class="progress">
+  <div class="progress-bar" id="bar"></div>
+</div>
+
+<div id="oran"></div>
+
+<!-- GERİ SAYIM -->
+<div class="geri">
+  <h3>Geri Sayım</h3>
+  <div id="liste"></div>
+</div>
+
+</div>
+
+<script>
+
+const baslangic = new Date("2026-02-05");
+const toplam = 177;
+
+function hesapla() {
+
+  const bugun = new Date();
+  const gecen = Math.floor((bugun - baslangic)/(1000*60*60*24));
+  const kalan = toplam - gecen;
+
+  const yuzde = (gecen / toplam) * 100;
+
+  document.getElementById("safak").innerText = kalan;
+  document.getElementById("atarsa").innerText = "Atarsa " + (kalan - 1);
+  document.getElementById("bar").style.width = yuzde + "%";
+  document.getElementById("oran").innerText = "%" + yuzde.toFixed(1);
+
+  // GERİ SAYIM LİSTE
+  const hedefler = [
+    {isim:"Yüzler", gun:100},
+    {isim:"İlk Ayın Bitmesi", gun:150},
+    {isim:"İkinci Ayın Bitmesi", gun:120},
+    {isim:"Çift Rakamlar", gun:99},
+    {isim:"Plakalar", gun:81},
+    {isim:"Son 2 Ay", gun:60},
+    {isim:"Son 1 Ay", gun:30},
+    {isim:"Tek Rakamlar", gun:9},
+    {isim:"Şafak Doğan Güneş", gun:1}
+  ];
+
+  let html = "";
+
+  hedefler.forEach(h => {
+    if (kalan <= h.gun) {
+      html += `<div class="ok">${h.isim} ✔</div>`;
+    } else {
+      html += `<div>${h.isim}: <span class="kaldi">${kalan - h.gun} Gün Kaldı</span></div>`;
+    }
+  });
+
+  document.getElementById("liste").innerHTML = html;
+}
+
+hesapla();
+setInterval(hesapla, 60000);
+
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Şafak Sayar</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: white;
+  text-align: center;
+}
+
+.container {
+  padding: 20px;
+}
+
 h1 {
   margin-top: 10px;
   font-size: 22px;
