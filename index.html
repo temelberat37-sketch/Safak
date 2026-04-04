@@ -7,8 +7,9 @@
 body{margin:0;font-family:sans-serif;background:#0f172a;color:#fff}
 .container{max-width:500px;margin:auto;padding:15px}
 h1{text-align:center}
+.stats{display:flex;justify-content:space-between;margin-bottom:10px;font-size:14px}
 .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-.day{padding:12px;border-radius:10px;background:#1e293b;text-align:center;font-size:14px;cursor:pointer;transition:.2s}
+.day{padding:12px;border-radius:10px;background:#1e293b;text-align:center;font-size:14px;cursor:pointer}
 .day.done{color:#000;font-weight:bold}
 textarea{width:100%;border-radius:8px;margin-top:5px;padding:8px;border:none}
 .note{margin-top:15px}
@@ -16,12 +17,17 @@ textarea{width:100%;border-radius:8px;margin-top:5px;padding:8px;border:none}
 .modal-box{background:#1e293b;padding:20px;border-radius:12px;text-align:center}
 input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 button{margin-top:10px;padding:10px;border:none;border-radius:8px;background:#22c55e;color:#000;font-weight:bold}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;padding:10px 20px;border-radius:8px;opacity:.9}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;padding:10px 20px;border-radius:8px}
 </style>
 </head>
 <body>
 <div class="container">
 <h1>🪖 Şafak Takip</h1>
+<div class="stats">
+<span id="passed">Geçen: 0</span>
+<span id="remaining">Kalan: 180</span>
+<span id="percent">%0</span>
+</div>
 <div id="grid" class="grid"></div>
 <div id="notes"></div>
 </div><div id="modal" class="modal">
@@ -35,7 +41,7 @@ button{margin-top:10px;padding:10px;border:none;border-radius:8px;background:#22
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-const firebaseConfig={apiKey:"AIzaSyCj2K_FUSgUxI0iDyWXdPmsCZSmUveYsRI",authDomain:"safakasayar.firebaseapp.com",databaseURL:"https://safakasayar-default-rtdb.firebaseio.com",projectId:"safakasayar",storageBucket:"safakasayar.firebasestorage.app",messagingSenderId:"865229978953",appId:"1:865229978953:web:0fb91576ffa5c82670ee98"};
+const firebaseConfig={apiKey:"AIzaSyCj2K_FUSgUxI0iDyWXdPmsCZSmUveYsRI",authDomain:"safakasayar.firebaseapp.com",databaseURL:"https://safakasayar-default-rtdb.firebaseio.com",projectId:"safakasayar"};
 
 const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
@@ -45,6 +51,7 @@ const grid=document.getElementById("grid");
 const notesDiv=document.getElementById("notes");
 let isAdmin=false;
 const adminPassword="1234";
+let doneCount=0;
 
 window.checkPass=function(){
 let val=document.getElementById("pass").value;
@@ -69,9 +76,15 @@ document.body.appendChild(t);
 setTimeout(()=>t.remove(),2000);
 }
 
-function getColor(i){
-let hue=(i*5)%360;
-return `hsl(${hue},70%,60%)`;
+function getColor(i){return `hsl(${(i*5)%360},70%,60%)`}
+
+function updateStats(){
+let passed=doneCount;
+let remaining=total-passed;
+let percent=Math.floor((passed/total)*100);
+document.getElementById("passed").innerText="Geçen: "+passed;
+document.getElementById("remaining").innerText="Kalan: "+remaining;
+document.getElementById("percent").innerText="%"+percent;
 }
 
 function init(){
@@ -82,12 +95,15 @@ d.innerText=i;
 
 onValue(ref(db,"days/"+i),snap=>{
 if(snap.val()){
+if(!d.classList.contains("done")) doneCount++;
 d.classList.add("done");
 d.style.background=getColor(i);
 }else{
+if(d.classList.contains("done")) doneCount--;
 d.classList.remove("done");
 d.style.background="#1e293b";
 }
+updateStats();
 });
 
 if(isAdmin){
@@ -108,7 +124,7 @@ ta.value=snap.val()||"";
 });
 
 if(isAdmin){
-ta.onchange=()=>set(ref(db,"notes/"+i),ta.value);
+ta.oninput=()=>set(ref(db,"notes/"+i),ta.value);
 }else ta.disabled=true;
 
 wrap.appendChild(ta);
