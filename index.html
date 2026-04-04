@@ -32,7 +32,7 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 <span id="passed">0</span>
 <span id="remaining">0</span>
 <span id="percent">%0</span>
-</div><div class="warn">⚠️ Not yazılmayan günler not alanında gösterilmemektedir</div><div id="grid" class="grid"></div>
+</div><div class="warn">⚠️ Ziyaretçi modunda sadece not yazılan günler görünür</div><div id="grid" class="grid"></div>
 <div id="notes"></div>
 </div><div id="modal" class="modal">
 <div class="modal-box">
@@ -62,9 +62,7 @@ let doneCount=0;
 const grid=document.getElementById("grid");
 const notesDiv=document.getElementById("notes");
 
-window.askerSec=()=>{
-document.getElementById("passBox").style.display="block";
-}
+window.askerSec=()=>{document.getElementById("passBox").style.display="block"}
 
 window.ziyaretciSec=()=>{
 isAdmin=false;
@@ -85,9 +83,7 @@ document.getElementById("error").innerText="Yanlış şifre";
 }
 }
 
-window.openModal=()=>{
-document.getElementById("modal").style.display="flex";
-}
+window.openModal=()=>{document.getElementById("modal").style.display="flex"}
 
 function toast(msg){
 let t=document.createElement("div");
@@ -145,19 +141,29 @@ let ta=document.createElement("textarea");
 
 onValue(ref(db,"notes/"+i),snap=>{
 let val=snap.val()||"";
-if(val!==""){
+
+if(isAdmin){
+// asker tüm günleri görür
 wrap.innerHTML=`<b>Gün ${i}</b>`;
 ta.value=val;
 wrap.appendChild(ta);
 notesDiv.appendChild(wrap);
 }
+else{
+// ziyaretçi sadece dolu notları görür
+if(val!==""){
+wrap.innerHTML=`<b>Gün ${i}</b>`;
+ta.value=val;
+ta.style.color="#fff";
+ta.disabled=true;
+wrap.appendChild(ta);
+notesDiv.appendChild(wrap);
+}
+}
 });
 
 if(isAdmin){
 ta.oninput=()=>set(ref(db,"notes/"+i),ta.value);
-}else{
-ta.disabled=true;
-ta.style.color="#fff";
 }
 }
 }
