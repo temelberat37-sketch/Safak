@@ -9,7 +9,7 @@ body{margin:0;font-family:sans-serif;background:#0f172a;color:#fff}
 h1{text-align:center}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .roleBtn{background:#334155;padding:6px 10px;border-radius:8px;cursor:pointer}
-.stats{display:flex;justify-content:space-between;font-size:14px;margin-bottom:10px}
+.stats{display:flex;flex-direction:column;font-size:14px;margin-bottom:10px;gap:4px}
 .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 .day{padding:12px;border-radius:10px;background:#1e293b;text-align:center;font-size:14px;cursor:pointer}
 .day.done{color:#000;font-weight:bold}
@@ -29,9 +29,10 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 <h3>🪖 Şafak</h3>
 <div class="roleBtn" onclick="openModal()" id="roleText">Ziyaretçi</div>
 </div><div class="stats">
-<span id="passed">0</span>
-<span id="remaining">0</span>
+<span id="passed">Geçen: 0</span>
+<span id="remaining">Kalan: 180</span>
 <span id="percent">%0</span>
+<span id="discharge">Terhis: -</span>
 </div><div class="warn">⚠️ Ziyaretçi modunda sadece not yazılan günler görünür</div><div id="grid" class="grid"></div>
 <div id="notes"></div>
 </div><div id="modal" class="modal">
@@ -49,7 +50,7 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-const firebaseConfig={apiKey:"AIzaSyCj2K_FUSgUxI0iDyWXdPmsCZSmUveYsRI",authDomain:"safakasayar.firebaseapp.com",databaseURL:"https://safakasayar-default-rtdb.firebaseio.com",projectId:"safakasayar"};
+const firebaseConfig={apiKey:"AIzaSy...",authDomain:"safakasayar.firebaseapp.com",databaseURL:"https://safakasayar-default-rtdb.firebaseio.com",projectId:"safakasayar"};
 
 const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
@@ -59,49 +60,30 @@ let isAdmin=false;
 const adminPassword="1234";
 let doneCount=0;
 
+const startDate=new Date();
+
 const grid=document.getElementById("grid");
 const notesDiv=document.getElementById("notes");
 
 window.askerSec=()=>{document.getElementById("passBox").style.display="block"}
-
-window.ziyaretciSec=()=>{
-isAdmin=false;
-document.getElementById("modal").style.display="none";
-document.getElementById("roleText").innerText="Ziyaretçi";
-init();
-}
-
-window.checkPass=function(){
-let val=document.getElementById("pass").value;
-if(val===adminPassword){
-isAdmin=true;
-document.getElementById("modal").style.display="none";
-document.getElementById("roleText").innerText="Asker";
-init();
-}else{
-document.getElementById("error").innerText="Yanlış şifre";
-}
-}
-
+window.ziyaretciSec=()=>{isAdmin=false;document.getElementById("modal").style.display="none";document.getElementById("roleText").innerText="Ziyaretçi";init();}
+window.checkPass=function(){let val=document.getElementById("pass").value;if(val===adminPassword){isAdmin=true;document.getElementById("modal").style.display="none";document.getElementById("roleText").innerText="Asker";init();}else{document.getElementById("error").innerText="Yanlış şifre";}}
 window.openModal=()=>{document.getElementById("modal").style.display="flex"}
 
-function toast(msg){
-let t=document.createElement("div");
-t.className="toast";
-t.innerText=msg;
-document.body.appendChild(t);
-setTimeout(()=>t.remove(),2000);
-}
-
+function toast(msg){let t=document.createElement("div");t.className="toast";t.innerText=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2000);}
 function getColor(i){return `hsl(${(i*5)%360},70%,60%)`}
 
 function updateStats(){
 let passed=doneCount;
 let remaining=total-passed;
 let percent=Math.floor((passed/total)*100);
+let dischargeDate=new Date(startDate);
+dischargeDate.setDate(startDate.getDate()+total);
+
 document.getElementById("passed").innerText="Geçen: "+passed;
 document.getElementById("remaining").innerText="Kalan: "+remaining;
 document.getElementById("percent").innerText="%"+percent;
+document.getElementById("discharge").innerText="Terhis: "+dischargeDate.toLocaleDateString();
 }
 
 function init(){
@@ -139,67 +121,24 @@ updateStats();
 });
 
 if(isAdmin){
-d.onclick=()=>set(ref(db,"days/"+i),!d.classList.contains("done"));
+d.onclick=()=>{
+let currentDay=total-doneCount;
+if(i>currentDay){toast("Daha o güne gelmedin ❌");return;}
+set(ref(db,"days/"+i),!d.classList.contains("done"));
+}
 }else{
 d.onclick=()=>toast("Sadece izliyorsun 👀");
 }
 
 onValue(ref(db,"notes/"+i),snap=>{
 let val=snap.val()||"";
-
-if(isAdmin){
-ta.value=val;
-}
-else{
-if(val!==""){
-ta.value=val;
-ta.style.color="#fff";
-ta.disabled=true;
-wrap.style.display="block";
-}else{
-wrap.style.display="none";
-}
+if(isAdmin){ta.value=val;}else{
+if(val!==""){ta.value=val;ta.style.color="#fff";ta.disabled=true;wrap.style.display="block";}else{wrap.style.display="none";}
 }
 });
 
-if(isAdmin){
-ta.oninput=()=>set(ref(db,"notes/"+i),ta.value);
+if(isAdmin){ta.oninput=()=>set(ref(db,"notes/"+i),ta.value);}        
 }
 }
-}
-
-// 🔎 ziyaretçi tıklayınca nota git + highlight
-function scrollToNote(day){
-  const notes = document.querySelectorAll('.note');
-  notes.forEach(n=>n.style.border='none');
-
-  notes.forEach(n=>{
-    if(n.innerText.includes('Gün '+day)){
-      n.scrollIntoView({behavior:'smooth',block:'center'});
-      n.style.border='2px solid #22c55e';
-      setTimeout(()=>n.style.border='none',4000);
-    }
-  });
-}
-
-// grid click override
-setTimeout(()=>{
-  document.querySelectorAll('.day').forEach(d=>{
-    d.onclick=()=>{
-      const day=d.innerText;
-      if(!isAdmin){
-        const noteRef=ref(db,"notes/"+day);
-        onValue(noteRef,snap=>{
-          if(snap.val()){
-            scrollToNote(day);
-          }else{
-            toast('Bu gün için not yok ❌');
-          }
-        },{onlyOnce:true});
-      }
-    }
-  });
-},1000);
-
 </script></body>
-                                                                                     </html>
+        </html>
