@@ -10,7 +10,7 @@ body{margin:0;font-family:sans-serif;background:#0f172a;color:#fff}
 .container{max-width:500px;margin:auto;padding:15px}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .roleBtn{background:#334155;padding:6px 10px;border-radius:8px;cursor:pointer}
-.stats{display:flex;justify-content:space-between;font-size:14px;margin-bottom:10px}
+.stats{display:flex;flex-direction:column;font-size:14px;margin-bottom:10px}
 .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 .day{padding:12px;border-radius:10px;background:#1e293b;text-align:center;cursor:pointer}
 .day.done{color:#000;font-weight:bold}
@@ -34,9 +34,11 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 </div>
 
 <div class="stats">
-<span id="passed">0</span>
-<span id="remaining">0</span>
+<span id="passed">Geçen: 0</span>
+<span id="remaining">Kalan: 0</span>
 <span id="percent">%0</span>
+<span id="discharge">Terhis: -</span>
+<span>Sülüs: 05.02.2026</span>
 </div>
 
 <div id="grid" class="grid"></div>
@@ -44,12 +46,9 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 
 </div>
 
-<!-- GİRİŞ MODALI -->
 <div id="modal" class="modal">
 <div class="modal-box">
-
 <h3>Giriş Seç</h3>
-
 <button onclick="askerSec()">🪖 Asker Girişi</button>
 <button onclick="ziyaretciSec()">👀 Ziyaretçi Girişi</button>
 
@@ -58,7 +57,6 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 <button onclick="checkPass()">Giriş</button>
 <p id="error" style="color:red"></p>
 </div>
-
 </div>
 </div>
 
@@ -77,12 +75,34 @@ const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
 
 const total=180;
+const startDate = new Date("2026-02-05");
+
 let isAdmin=false;
 const adminPassword="1234";
 let doneCount=0;
 
 const grid=document.getElementById("grid");
 const notesDiv=document.getElementById("notes");
+
+function getPassedDays(){
+let today=new Date();
+let diff=Math.floor((today-startDate)/(1000*60*60*24));
+return diff<0?0:diff;
+}
+
+function updateStats(){
+let passed=getPassedDays();
+let remaining=total-passed;
+let percent=Math.floor((passed/total)*100);
+
+let discharge=new Date(startDate);
+discharge.setDate(discharge.getDate()+total);
+
+document.getElementById("passed").innerText="Geçen: "+passed;
+document.getElementById("remaining").innerText="Kalan: "+remaining;
+document.getElementById("percent").innerText="%"+percent;
+document.getElementById("discharge").innerText="Terhis: "+discharge.toLocaleDateString();
+}
 
 function toast(msg){
 let t=document.createElement("div");
@@ -96,20 +116,7 @@ function getColor(i){
 return `hsl(${(i*5)%360},70%,60%)`;
 }
 
-function updateStats(){
-let passed=doneCount;
-let remaining=total-passed;
-let percent=Math.floor((passed/total)*100);
-
-document.getElementById("passed").innerText="Geçen: "+passed;
-document.getElementById("remaining").innerText="Kalan: "+remaining;
-document.getElementById("percent").innerText="%"+percent;
-}
-
-// 👇 GİRİŞ SİSTEMİ
-window.askerSec=()=>{
-document.getElementById("passBox").style.display="block";
-}
+window.askerSec=()=>document.getElementById("passBox").style.display="block";
 
 window.ziyaretciSec=()=>{
 isAdmin=false;
@@ -120,7 +127,6 @@ init();
 
 window.checkPass=function(){
 let val=document.getElementById("pass").value;
-
 if(val===adminPassword){
 isAdmin=true;
 document.getElementById("modal").style.display="none";
@@ -133,10 +139,8 @@ document.getElementById("error").innerText="Yanlış şifre";
 
 window.openModal=()=>document.getElementById("modal").style.display="flex";
 
-// 🔥 highlight sistemi
 function scrollToNote(day){
 const notes=document.querySelectorAll('.note');
-
 notes.forEach(n=>n.style.border='none');
 
 notes.forEach(n=>{
@@ -152,6 +156,8 @@ function init(){
 grid.innerHTML="";
 notesDiv.innerHTML="";
 doneCount=0;
+
+updateStats();
 
 for(let i=total;i>=1;i--){
 
@@ -174,15 +180,12 @@ notesDiv.appendChild(wrap);
 
 onValue(ref(db,"days/"+i),snap=>{
 if(snap.val()){
-if(!d.classList.contains("done")) doneCount++;
 d.classList.add("done");
 d.style.background=getColor(i);
 }else{
-if(d.classList.contains("done")) doneCount--;
 d.classList.remove("done");
 d.style.background="#1e293b";
 }
-updateStats();
 });
 
 onValue(ref(db,"notes/"+i),snap=>{
@@ -215,14 +218,12 @@ scrollToNote(i);
 toast("Bu gün için not yok ❌");
 }
 },{onlyOnce:true});
-
 }
 }
 
 }
 }
-
 </script>
 
 </body>
-  </html>
+</html>
