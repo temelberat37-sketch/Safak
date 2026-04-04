@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Şafak Takip</title>
+
+<style>
+body{margin:0;font-family:sans-serif;background:#0f172a;color:#fff}
+.container{max-width:500px;margin:auto;padding:15px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.roleBtn{background:#334155;padding:6px 10px;border-radius:8px;cursor:pointer}
+.stats{display:flex;justify-content:space-between;font-size:14px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.day{padding:12px;border-radius:10px;background:#1e293b;text-align:center;cursor:pointer}
+.day.done{color:#000;font-weight:bold}
+.note{margin-top:10px}
+textarea{width:100%;border-radius:8px;margin-top:5px;padding:8px;border:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center}
+.modal-box{background:#1e293b;padding:20px;border-radius:12px;text-align:center}
+button{margin-top:10px;padding:10px;border:none;border-radius:8px;background:#22c55e;color:#000;width:100%}
+input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;padding:10px 20px;border-radius:8px}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="topbar">
+<h3>🪖 Şafak</h3>
+<div class="roleBtn" onclick="openModal()" id="roleText">Ziyaretçi</div>
+</div>
+
+<div class="stats">
+<span id="passed">0</span>
+<span id="remaining">0</span>
+<span id="percent">%0</span>
+</div>
+
+<div id="grid" class="grid"></div>
+<div id="notes"></div>
+
+</div>
+
+<div id="modal" class="modal">
+<div class="modal-box">
+<h3>Şifre</h3>
+<input type="password" id="pass" placeholder="Şifre">
+<button onclick="checkPass()">Giriş</button>
+<p id="error" style="color:red"></p>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+const firebaseConfig={
+apiKey:"AIzaSy...",
+authDomain:"safakasayar.firebaseapp.com",
+databaseURL:"https://safakasayar-default-rtdb.firebaseio.com",
+projectId:"safakasayar"
+};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
+const total=180;
+let isAdmin=false;
+const adminPassword="1234";
+let doneCount=0;
+
+const grid=document.getElementById("grid");
+const notesDiv=document.getElementById("notes");
+
+function toast(msg){
+let t=document.createElement("div");
+t.className="toast";
+t.innerText=msg;
+document.body.appendChild(t);
+setTimeout(()=>t.remove(),2000);
+}
+
+function getColor(i){
+return `hsl(${(i*5)%360},70%,60%)`;
+}
+
+function updateStats(){
+let passed=doneCount;
+let remaining=total-passed;
+let percent=Math.floor((passed/total)*100);
+
+document.getElementById("passed").innerText="Geçen: "+passed;
+document.getElementById("remaining").innerText="Kalan: "+remaining;
+document.getElementById("percent").innerText="%"+percent;
+}
+
+window.checkPass=function(){
+let val=document.getElementById("pass").value;
+if(val===adminPassword){
+isAdmin=true;
+document.getElementById("modal").style.display="none";
+document.getElementById("roleText").innerText="Asker";
+init();
+}else{
+document.getElementById("error").innerText="Yanlış şifre";
+}
+}
+
+window.openModal=()=>document.getElementById("modal").style.display="flex";
+
+// 🔥 highlight + scroll
+function scrollToNote(day){
+const notes=document.querySelectorAll('.note');
+
+notes.forEach(n=>n.style.border='none');
+
+notes.forEach(n=>{
+if(n.innerText.includes('Gün '+day)){
+n.scrollIntoView({behavior:'smooth',block:'center'});
+n.style.border='2px solid #22c55e';
+setTimeout(()=>n.style.border='none',4000);
+}
+});
+}
+
+function init(){
+grid.innerHTML="";
+notesDiv.innerHTML="";
+doneCount=0;
+
+for(let i=total;i>=1;i--){
+
+let d=document.createElement("div");
+d.className="day";
+d.innerText=i;
+grid.appendChild(d);
+
+let wrap=document.createElement("div");
+wrap.className="note";
+
+let title=document.createElement("b");
+title.innerText="Gün "+i;
+
+let ta=document.createElement("textarea");
+
+wrap.appendChild(title);
+wrap.appendChild(ta);
+notesDiv.appendChild(wrap);
+
+onValue(ref(db,"days/"+i),snap=>{
+if(snap.val()){
+if(!d.classList.contains("done")) doneCount++;
+d.classList.add("done");
+d.style.background=getColor(i);
+}else{
+if(d.classList.contains("done")) doneCount--;
+d.classList.remove("done");
+d.style.background="#1e293b";
+}
+updateStats();
+});
+
+onValue(ref(db,"notes/"+i),snap=>{
+let val=snap.val()||"";
+
+if(isAdmin){
+ta.value=val;
+}else{
+if(val!==""){
+ta.value=val;
+ta.disabled=true;
+ta.style.color="#fff";
+}else{
+wrap.style.display="none";
+}
+}
+});
+
+if(isAdmin){
+d.onclick=()=>set(ref(db,"days/"+i),!d.classList.contains("done"));
+ta.oninput=()=>set(ref(db,"notes/"+i),ta.value);
+}else{
+d.onclick=()=>{
+const noteRef=ref(db,"notes/"+i);
+
+onValue(noteRef,snap=>{
+if(snap.val()){
+scrollToNote(i);
+}else{
+toast("Bu gün için not yok ❌");
+}
+},{onlyOnce:true});
+
+}
+}
+
+}
+}
+
+</script>
+
+</body>
+  </html>
