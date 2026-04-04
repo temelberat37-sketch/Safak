@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Şafak Takip</title>
+<style>
+body{margin:0;font-family:sans-serif;background:#0f172a;color:#fff}
+.container{max-width:500px;margin:auto;padding:15px}
+.header{text-align:center;font-size:12px;color:#f87171;margin-bottom:5px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.roleBtn{background:#334155;padding:6px 10px;border-radius:8px;cursor:pointer}
+.stats{display:flex;flex-direction:column;font-size:14px;margin-bottom:10px;gap:4px}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.day{padding:12px;border-radius:10px;background:#1e293b;text-align:center;font-size:14px;cursor:pointer}
+.day.done{color:#000;font-weight:bold}
+.note{margin-top:10px}
+textarea{width:100%;border-radius:8px;margin-top:5px;padding:8px;border:none}
+.warn{color:#ef4444;font-size:13px;margin:10px 0}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center}
+.modal-box{background:#1e293b;padding:20px;border-radius:12px;text-align:center}
+button{margin-top:10px;padding:10px;border:none;border-radius:8px;background:#22c55e;color:#000;font-weight:bold;width:100%}
+input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;padding:10px 20px;border-radius:8px}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">⚠️ TEST İÇİN REVİZE 2</div>
+<div class="topbar">
+<h3>🪖 Şafak</h3>
+<div class="roleBtn" onclick="openModal()" id="roleText">Ziyaretçi</div>
+</div>
+
+<div class="stats">
+<span id="passed">Geçen: 0</span>
+<span id="remaining">Kalan: 180</span>
+<span id="percent">%0</span>
+<span id="discharge">Terhis: -</span>
+<span id="start">Sülüs: 05.02.2026</span>
+</div>
+
+<div class="warn">⚠️ Ziyaretçi modunda sadece not yazılan günler görünür</div>
+
+<div id="grid" class="grid"></div>
+<div id="notes"></div>
+</div>
+
+<div id="modal" class="modal">
+<div class="modal-box">
+<h3>Giriş Seç</h3>
+<button onclick="askerSec()">🪖 Asker Girişi</button>
+<button onclick="ziyaretciSec()">👀 Ziyaretçi Girişi</button>
+<div id="passBox" style="display:none">
+<input type="password" id="pass" placeholder="Şifre gir">
+<button onclick="checkPass()">Giriş</button>
+<p id="error" style="color:red"></p>
+</div>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
+
+const firebaseConfig={apiKey:"AIzaSy...",authDomain:"safakasayar.firebaseapp.com",databaseURL:"https://safakasayar-default-rtdb.firebaseio.com",projectId:"safakasayar"};
+
+const app=initializeApp(firebaseConfig);
+const db=getDatabase(app);
+
+const total=180;
+const startDate=new Date("2026-02-05");
+let isAdmin=false;
+const adminPassword="1234";
+let doneCount=0;
+
+const grid=document.getElementById("grid");
+const notesDiv=document.getElementById("notes");
+
+window.askerSec=()=>{document.getElementById("passBox").style.display="block"}
+window.ziyaretciSec=()=>{isAdmin=false;document.getElementById("modal").style.display="none";document.getElementById("roleText").innerText="Ziyaretçi";init();}
+window.checkPass=function(){let val=document.getElementById("pass").value;if(val===adminPassword){isAdmin=true;document.getElementById("modal").style.display="none";document.getElementById("roleText").innerText="Asker";init();}else{document.getElementById("error").innerText="Yanlış şifre";}}
+window.openModal=()=>{document.getElementById("modal").style.display="flex"}
+
+function toast(msg){let t=document.createElement("div");t.className="toast";t.innerText=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2000);}
+function getColor(i){return `hsl(${(i*5)%360},70%,60%)`}
+
+function updateStats(){
+let passed=doneCount;
+let remaining=total-passed;
+let percent=Math.floor((passed/total)*100);
+
+let dischargeDate=new Date(startDate);
+dischargeDate.setDate(startDate.getDate()+total);
+
+document.getElementById("passed").innerText="Geçen: "+passed;
+document.getElementById("remaining").innerText="Kalan: "+remaining;
+document.getElementById("percent").innerText="%"+percent;
+document.getElementById("discharge").innerText="Terhis: "+dischargeDate.toLocaleDateString();
+}
+
+function init(){
+grid.innerHTML="";
+notesDiv.innerHTML="";
+doneCount=0;
+
+for(let i=total;i>=1;i--){
+let d=document.createElement("div");
+d.className="day";
+d.innerText=i;
+
+grid.appendChild(d);
+
+let wrap=document.createElement("div");
+wrap.className="note";
+let title=document.createElement("b");
+title.innerText="Gün "+i;
+let ta=document.createElement("textarea");
+wrap.appendChild(title);
+wrap.appendChild(ta);
+notesDiv.appendChild(wrap);
+
+onValue(ref(db,"days/"+i),snap=>{
+if(snap.val()){
+if(!d.classList.contains("done")) doneCount++;
+d.classList.add("done");
+d.style.background=getColor(i);
+}else{
+if(d.classList.contains("done")) doneCount--;
+d.classList.remove("done");
+d.style.background="#1e293b";
+}
+updateStats();
+});
+
+if(isAdmin){
+d.onclick=()=>{
+// otomatik gün hesabı (gerçek tarihe göre)
+let today=new Date();
+let diff=Math.floor((today-startDate)/(1000*60*60*24));
+let currentDay=total-diff;
+
+if(i!==currentDay){toast("Sırayla ilerle ❌");return;}
+
+set(ref(db,"days/"+i),true);
+}
+}else{
+d.onclick=()=>toast("Sadece izliyorsun 👀");
+}
+
+onValue(ref(db,"notes/"+i),snap=>{
+let val=snap.val()||"";
+if(isAdmin){ta.value=val;}else{
+if(val!==""){ta.value=val;ta.style.color="#fff";ta.disabled=true;wrap.style.display="block";}else{wrap.style.display="none";}
+}
+});
+
+if(isAdmin){ta.oninput=()=>set(ref(db,"notes/"+i),ta.value);}        
+}
+}
+</script>
+</body>
+  </html>
+  
