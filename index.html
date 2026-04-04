@@ -25,7 +25,7 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 </head>
 <body>
 <div class="container">
-<div class="header">⚠️ TEST İÇİN REVİZE 1</div>
+<div class="header">⚠️ TEST İÇİN REVİZE 2</div>
 <div class="topbar">
 <h3>🪖 Şafak</h3>
 <div class="roleBtn" onclick="openModal()" id="roleText">Ziyaretçi</div>
@@ -34,6 +34,7 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 <span id="remaining">Kalan: 180</span>
 <span id="percent">%0</span>
 <span id="discharge">Terhis: -</span>
+<span id="start">Sülüs: 05.02.2026</span>
 </div><div class="warn">⚠️ Ziyaretçi modunda sadece not yazılan günler görünür</div><div id="grid" class="grid"></div>
 <div id="notes"></div>
 </div><div id="modal" class="modal">
@@ -57,11 +58,10 @@ const app=initializeApp(firebaseConfig);
 const db=getDatabase(app);
 
 const total=180;
+const startDate=new Date("2026-02-05");
 let isAdmin=false;
 const adminPassword="1234";
 let doneCount=0;
-
-const startDate=new Date();
 
 const grid=document.getElementById("grid");
 const notesDiv=document.getElementById("notes");
@@ -78,6 +78,7 @@ function updateStats(){
 let passed=doneCount;
 let remaining=total-passed;
 let percent=Math.floor((passed/total)*100);
+
 let dischargeDate=new Date(startDate);
 dischargeDate.setDate(startDate.getDate()+total);
 
@@ -123,12 +124,13 @@ updateStats();
 
 if(isAdmin){
 d.onclick=()=>{
-// sadece sıradaki gün boyanabilir
-let nextDay = total - doneCount;
-if(i !== nextDay){
-toast("Sırayla ilerle ❌");
-return;
-}
+// otomatik gün hesabı (gerçek tarihe göre)
+let today=new Date();
+let diff=Math.floor((today-startDate)/(1000*60*60*24));
+let currentDay=total-diff;
+
+if(i!==currentDay){toast("Sırayla ilerle ❌");return;}
+
 set(ref(db,"days/"+i),true);
 }
 }else{
