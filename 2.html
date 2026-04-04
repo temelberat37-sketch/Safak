@@ -1,113 +1,95 @@
 <!DOCTYPE html><html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>Şafak Karalama</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }h1 {
-  margin-bottom: 10px;
-}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Şafak</title>
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#0b1220;
+  color:white;
+}.header{ height:250px; background:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') center/cover; display:flex; flex-direction:column; justify-content:center; align-items:center; }
 
-.info {
-  margin-bottom: 20px;
-}
+.header h1{ font-size:60px; margin:0; }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-  gap: 8px;
-  max-width: 900px;
-  margin: auto;
-}
+.header p{ margin:5px; font-size:18px; }
 
-.day {
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
-}
+.cards{ display:flex; gap:15px; padding:15px; }
 
-.day:hover {
-  transform: scale(1.1);
-}
+.card{ flex:1; background:#111827; border-radius:20px; padding:20px; text-align:center; }
 
-.done {
-  background: #22c55e;
-  text-decoration: line-through;
-}
+.circle{ width:120px; height:120px; border-radius:50%; border:10px solid #1f2937; border-top:10px solid orange; display:flex; align-items:center; justify-content:center; margin:15px auto; font-size:22px; }
 
-.today {
-  background: #f59e0b;
-}
+.grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(45px,1fr)); gap:6px; padding:15px; }
 
-.future {
-  background: #334155;
-}
+.day{ padding:8px; border-radius:6px; text-align:center; font-size:12px; cursor:pointer; }
 
-.stats {
-  margin: 20px;
-  font-size: 18px;
-}
+.done{background:#22c55e;text-decoration:line-through;} .today{background:orange;} .future{background:#1f2937;}
 
-  </style>
+</style>
 </head>
-<body>  <h1>Şafak Karalama</h1>  <div class="info">
-    <p>Sülüs Tarihi: 05.02.2026</p>
-    <p>Toplam Gün: 180</p>
-    <p>Yol İzni: 1 gün | Yasal İzin: 6 gün | Kullanılan: 3 gün</p>
-  </div>  <div class="stats">
-    <p id="remaining"></p>
-    <p id="passed"></p>
-  </div>  <div class="grid" id="grid"></div><script>
+<body><div class="header">
+  <p>Şafak →</p>
+  <h1 id="today">119</h1>
+  <p>Atarsa → 118</p>
+</div><div class="cards">
+  <div class="card">
+    <h3>Kalan Süre</h3>
+    <div class="circle" id="remainCircle">118</div>
+    <p id="remainText"></p>
+  </div>
+  <div class="card">
+    <h3>Geçen Süre</h3>
+    <div class="circle" id="passedCircle">0</div>
+    <p id="passedText"></p>
+  </div>
+</div><div class="grid" id="grid"></div><script>
+const total=180;
+const today=119;
+const izin= (1+6)-3;
 
-const totalDays = 180;
-const izinToplam = 1 + 6;
-const kullanilan = 3;
-const dusulecek = izinToplam - kullanilan;
+const grid=document.getElementById('grid');
 
-// Bugünün şafak hesabı
-const todaySafak = 119; // BURAYI MANUEL DEĞİŞTİREBİLİRSİN
+let doneCount=0;
 
-const grid = document.getElementById("grid");
+for(let i=total;i>=1;i--){
+  const d=document.createElement('div');
+  d.className='day';
+  d.innerText=i;
 
-for (let i = totalDays; i >= 1; i--) {
-  const div = document.createElement("div");
-  div.classList.add("day");
-  div.innerText = i;
-
-  if (i > todaySafak) {
-    div.classList.add("done");
-  } else if (i === todaySafak) {
-    div.classList.add("today");
-  } else {
-    div.classList.add("future");
+  if(i>today){
+    d.classList.add('done');
+    doneCount++;
+  }
+  else if(i===today){
+    d.classList.add('today');
+  }
+  else{
+    d.classList.add('future');
   }
 
-  div.addEventListener("click", () => {
-    if (i !== todaySafak) {
-      div.classList.toggle("done");
-      updateStats();
+  d.onclick=()=>{
+    if(i!==today){
+      d.classList.toggle('done');
+      update();
     }
-  });
+  }
 
-  grid.appendChild(div);
+  grid.appendChild(d);
 }
 
-function updateStats() {
-  const doneCount = document.querySelectorAll(".done").length;
-  const kalan = totalDays - doneCount - dusulecek;
+function update(){
+  doneCount=document.querySelectorAll('.done').length;
+  const kalan= total - doneCount - izin;
 
-  document.getElementById("remaining").innerText = "Kalan Gün: " + kalan;
-  document.getElementById("passed").innerText = "Geçen Gün: " + doneCount;
+  document.getElementById('remainCircle').innerText=kalan;
+  document.getElementById('passedCircle').innerText=doneCount;
+
+  document.getElementById('remainText').innerText= kalan + ' Gün';
+  document.getElementById('passedText').innerText= doneCount + ' Gün';
 }
 
-updateStats();
-
+update();
 </script></body>
-  </html>
+      </html>
