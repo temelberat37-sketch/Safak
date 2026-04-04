@@ -8,18 +8,61 @@
 <style>
 body{margin:0;font-family:sans-serif;background:#0f172a;color:#fff}
 .container{max-width:500px;margin:auto;padding:15px}
+
+/* 🔥 MODERN BİLGİ KARTI */
+.infoCard{
+background:#1e293b;
+border-radius:20px;
+padding:15px;
+margin-bottom:15px;
+box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+.infoTitle{
+font-size:18px;
+margin-bottom:10px;
+color:#38bdf8;
+}
+
+.infoGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.infoItem{
+background:#0f172a;
+padding:10px;
+border-radius:12px;
+text-align:center;
+}
+
+.infoItem span{
+display:block;
+font-size:12px;
+color:#94a3b8;
+}
+
+.infoItem b{
+font-size:16px;
+}
+
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .roleBtn{background:#334155;padding:6px 10px;border-radius:8px;cursor:pointer}
-.stats{display:flex;flex-direction:column;font-size:14px;margin-bottom:10px}
+
 .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 .day{padding:12px;border-radius:10px;background:#1e293b;text-align:center;cursor:pointer}
 .day.done{color:#000;font-weight:bold}
+
 .note{margin-top:10px}
 textarea{width:100%;border-radius:8px;margin-top:5px;padding:8px;border:none}
+
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center}
 .modal-box{background:#1e293b;padding:20px;border-radius:12px;text-align:center}
+
 button{margin-top:10px;padding:10px;border:none;border-radius:8px;background:#22c55e;color:#000;width:100%}
 input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
+
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;padding:10px 20px;border-radius:8px}
 </style>
 </head>
@@ -33,12 +76,36 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 <div class="roleBtn" onclick="openModal()" id="roleText">Ziyaretçi</div>
 </div>
 
-<div class="stats">
-<span id="passed">Geçen: 0</span>
-<span id="remaining">Kalan: 0</span>
-<span id="percent">%0</span>
-<span id="discharge">Terhis: -</span>
-<span>Sülüs: 05.02.2026</span>
+<!-- 🔥 YENİ MODERN KART -->
+<div class="infoCard">
+<div class="infoTitle">Şafak Bilgisi</div>
+
+<div class="infoGrid">
+<div class="infoItem">
+<span>Geçen</span>
+<b id="passed">0</b>
+</div>
+
+<div class="infoItem">
+<span>Kalan</span>
+<b id="remaining">0</b>
+</div>
+
+<div class="infoItem">
+<span>Yüzde</span>
+<b id="percent">%0</b>
+</div>
+
+<div class="infoItem">
+<span>Terhis</span>
+<b id="discharge">-</b>
+</div>
+
+<div class="infoItem" style="grid-column: span 2;">
+<span>Sülüs Tarihi</span>
+<b>05 Şubat 2026</b>
+</div>
+</div>
 </div>
 
 <div id="grid" class="grid"></div>
@@ -46,8 +113,10 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 
 </div>
 
+<!-- MODAL -->
 <div id="modal" class="modal">
 <div class="modal-box">
+
 <h3>Giriş Seç</h3>
 <button onclick="askerSec()">🪖 Asker Girişi</button>
 <button onclick="ziyaretciSec()">👀 Ziyaretçi Girişi</button>
@@ -57,6 +126,7 @@ input{padding:10px;border-radius:8px;border:none;width:100%;margin-top:10px}
 <button onclick="checkPass()">Giriş</button>
 <p id="error" style="color:red"></p>
 </div>
+
 </div>
 </div>
 
@@ -78,12 +148,11 @@ const total=180;
 const startDate = new Date("2026-02-05");
 
 let isAdmin=false;
-const adminPassword="1234";
-let doneCount=0;
 
 const grid=document.getElementById("grid");
 const notesDiv=document.getElementById("notes");
 
+// 🔥 HESAPLAMA
 function getPassedDays(){
 let today=new Date();
 let diff=Math.floor((today-startDate)/(1000*60*60*24));
@@ -98,24 +167,13 @@ let percent=Math.floor((passed/total)*100);
 let discharge=new Date(startDate);
 discharge.setDate(discharge.getDate()+total);
 
-document.getElementById("passed").innerText="Geçen: "+passed;
-document.getElementById("remaining").innerText="Kalan: "+remaining;
+document.getElementById("passed").innerText=passed;
+document.getElementById("remaining").innerText=remaining;
 document.getElementById("percent").innerText="%"+percent;
-document.getElementById("discharge").innerText="Terhis: "+discharge.toLocaleDateString();
+document.getElementById("discharge").innerText=discharge.toLocaleDateString();
 }
 
-function toast(msg){
-let t=document.createElement("div");
-t.className="toast";
-t.innerText=msg;
-document.body.appendChild(t);
-setTimeout(()=>t.remove(),2000);
-}
-
-function getColor(i){
-return `hsl(${(i*5)%360},70%,60%)`;
-}
-
+// 🔐 GİRİŞ
 window.askerSec=()=>document.getElementById("passBox").style.display="block";
 
 window.ziyaretciSec=()=>{
@@ -125,9 +183,8 @@ document.getElementById("roleText").innerText="Ziyaretçi";
 init();
 }
 
-window.checkPass=function(){
-let val=document.getElementById("pass").value;
-if(val===adminPassword){
+window.checkPass=()=>{
+if(document.getElementById("pass").value==="1234"){
 isAdmin=true;
 document.getElementById("modal").style.display="none";
 document.getElementById("roleText").innerText="Asker";
@@ -139,6 +196,7 @@ document.getElementById("error").innerText="Yanlış şifre";
 
 window.openModal=()=>document.getElementById("modal").style.display="flex";
 
+// 🎯 HIGHLIGHT
 function scrollToNote(day){
 const notes=document.querySelectorAll('.note');
 notes.forEach(n=>n.style.border='none');
@@ -155,7 +213,6 @@ setTimeout(()=>n.style.border='none',4000);
 function init(){
 grid.innerHTML="";
 notesDiv.innerHTML="";
-doneCount=0;
 
 updateStats();
 
@@ -181,7 +238,7 @@ notesDiv.appendChild(wrap);
 onValue(ref(db,"days/"+i),snap=>{
 if(snap.val()){
 d.classList.add("done");
-d.style.background=getColor(i);
+d.style.background=`hsl(${(i*5)%360},70%,60%)`;
 }else{
 d.classList.remove("done");
 d.style.background="#1e293b";
@@ -209,13 +266,11 @@ d.onclick=()=>set(ref(db,"days/"+i),!d.classList.contains("done"));
 ta.oninput=()=>set(ref(db,"notes/"+i),ta.value);
 }else{
 d.onclick=()=>{
-const noteRef=ref(db,"notes/"+i);
-
-onValue(noteRef,snap=>{
+onValue(ref(db,"notes/"+i),snap=>{
 if(snap.val()){
 scrollToNote(i);
 }else{
-toast("Bu gün için not yok ❌");
+alert("Bu gün için not yok ❌");
 }
 },{onlyOnce:true});
 }
@@ -226,4 +281,4 @@ toast("Bu gün için not yok ❌");
 </script>
 
 </body>
-</html>
+  </html>
