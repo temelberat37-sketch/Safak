@@ -167,5 +167,39 @@ ta.oninput=()=>set(ref(db,"notes/"+i),ta.value);
 }
 }
 }
+
+// 🔎 ziyaretçi tıklayınca nota git + highlight
+function scrollToNote(day){
+  const notes = document.querySelectorAll('.note');
+  notes.forEach(n=>n.style.border='none');
+
+  notes.forEach(n=>{
+    if(n.innerText.includes('Gün '+day)){
+      n.scrollIntoView({behavior:'smooth',block:'center'});
+      n.style.border='2px solid #22c55e';
+      setTimeout(()=>n.style.border='none',4000);
+    }
+  });
+}
+
+// grid click override
+setTimeout(()=>{
+  document.querySelectorAll('.day').forEach(d=>{
+    d.onclick=()=>{
+      const day=d.innerText;
+      if(!isAdmin){
+        const noteRef=ref(db,"notes/"+day);
+        onValue(noteRef,snap=>{
+          if(snap.val()){
+            scrollToNote(day);
+          }else{
+            toast('Bu gün için not yok ❌');
+          }
+        },{onlyOnce:true});
+      }
+    }
+  });
+},1000);
+
 </script></body>
-  </html>
+                                                                                     </html>
