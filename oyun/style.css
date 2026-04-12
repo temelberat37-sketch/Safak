@@ -1,0 +1,6 @@
+body{margin:0;background:black;color:white;font-family:Arial;text-align:center}
+canvas{display:none}
+#menu{position:absolute;top:30%;width:100%}
+#gameover{position:absolute;top:30%;width:100%}
+.hidden{display:none}
+button{padding:10px 20px;font-size:18px}
