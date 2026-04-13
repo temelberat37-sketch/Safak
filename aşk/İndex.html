@@ -3,101 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Love Game2</title>
+<title>Love Game Pro</title>
 
 <style>
-body {
-  margin:0;
-  font-family: Arial;
-  background: linear-gradient(135deg,#ff4d6d,#ff99ac);
-  color:white;
-  overflow:hidden;
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#ff4d6d,#ff99ac);
+color:white;
+overflow:hidden;
 }
 
-header {
-  text-align:center;
-  padding:15px;
-  font-size:22px;
-  font-weight:bold;
+header{
+text-align:center;
+padding:15px;
+font-size:22px;
+font-weight:bold;
 }
 
-.container {
-  padding:15px;
+.container{padding:15px;}
+
+.category{
+background:rgba(255,255,255,0.2);
+backdrop-filter:blur(10px);
+padding:14px;
+margin:10px 0;
+border-radius:15px;
+text-align:center;
+cursor:pointer;
+transition:0.3s;
 }
 
-.category {
-  background:rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  padding:15px;
-  margin:10px 0;
-  border-radius:15px;
-  text-align:center;
-  cursor:pointer;
+.category:hover{transform:scale(1.05);}
+
+#cardArea{
+position:relative;
+width:100%;
+height:65vh;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
-#cardArea {
-  position:relative;
-  width:100%;
-  height:65vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.card{
+position:absolute;
+width:85%;
+padding:25px;
+border-radius:25px;
+text-align:center;
+font-size:20px;
+background:rgba(20,0,10,0.95);
+box-shadow:0 10px 40px rgba(0,0,0,0.5);
+transition:0.4s;
 }
 
-/* ANA KART */
-.card {
-  position:absolute;
-  width:85%;
-  padding:25px;
-  border-radius:25px;
-  text-align:center;
-  font-size:20px;
-  background: rgba(20,0,10,0.95);
-  box-shadow:0 10px 40px rgba(0,0,0,0.5);
-  transition:0.4s;
-}
-
-/* ALT KARTLAR */
 .card:nth-child(2){
-  transform:scale(0.95) translateY(10px);
-  opacity:0.4;
-  filter:blur(3px);
+transform:scale(0.95) translateY(10px);
+opacity:0.4;
+filter:blur(3px);
 }
+
 .card:nth-child(3){
-  transform:scale(0.9) translateY(20px);
-  opacity:0.2;
-  filter:blur(5px);
+transform:scale(0.9) translateY(20px);
+opacity:0.2;
+filter:blur(5px);
 }
 
-.controls {
-  position:absolute;
-  bottom:20px;
-  width:100%;
-  display:flex;
-  justify-content:center;
-  gap:15px;
+.controls{
+position:absolute;
+bottom:20px;
+width:100%;
+display:flex;
+justify-content:center;
+gap:15px;
 }
 
-.btn {
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  border:none;
-  font-size:22px;
-  cursor:pointer;
+.btn{
+width:60px;
+height:60px;
+border-radius:50%;
+border:none;
+font-size:22px;
 }
 
-.left { background:#ff4d6d; }
-.right { background:#00e676; }
+.left{background:#ff4d6d;}
+.right{background:#00e676;}
 
-/* oyuncu gösterge */
-.player {
-  text-align:center;
-  margin-top:5px;
-  font-size:14px;
-  opacity:0.8;
+.player{
+text-align:center;
+font-size:14px;
+opacity:0.8;
+margin-top:5px;
 }
-
 </style>
 </head>
 
@@ -108,164 +105,232 @@ header {
 <div class="container" id="home"></div>
 
 <div id="questions" style="display:none;">
-  <button onclick="goHome()">⬅</button>
+<button onclick="goHome()">⬅</button>
 
-  <div class="player" id="playerInfo"></div>
+<div class="player" id="playerInfo"></div>
+<div id="cardArea"></div>
 
-  <div id="cardArea"></div>
-
-  <div class="controls">
-    <button class="btn left" onclick="prev()">⬅</button>
-    <button class="btn right" onclick="next()">➡</button>
-  </div>
+<div class="controls">
+<button class="btn left" onclick="prev()">⬅</button>
+<button class="btn right" onclick="next()">➡</button>
+</div>
 </div>
 
 <script>
 
 const data = {
-"Cesur +18":[
-"Kontrol sende mi olmalı yoksa bende mi?",
-"Işıklar açık mı kapalı mı?",
-"Yavaş mı hızlı mı?",
-"Göz teması mı yoksa his mi?",
-"Sürpriz mi planlı mı?",
-"Dominant mı yoksa daha uyumlu musun?",
-"Risk almayı sever misin?"
+
+/* 💕 ROMANTİK */
+"Romantik":[
+"Beni en çok ne zaman sevdin?",
+"Benimle ilgili en sevdiğin şey ne?",
+"Hayalindeki romantik an ne?",
+"Birlikte yaşlanmak ister misin?",
+"Bana yazacağın en güzel mesaj?",
+"Beni ilk gördüğünde ne düşündün?",
+"Beni kaybetmek nasıl hissettirir?",
+"Benimle geleceği hayal ediyor musun?",
+"Sana kendimi özel hissettirdim mi?",
+"Beni ne zaman özlüyorsun?"
 ],
 
+/* 🔥 CESUR */
+"Cesur +18":[
+"Kontrol sende mi bende mi?",
+"Işıklar açık mı kapalı mı?",
+"Yavaş mı hızlı mı?",
+"Göz teması mı his mi?",
+"Dominant mı uyumlu mu?",
+"Risk almayı sever misin?",
+"Sürpriz mi planlı mı?",
+"Anı mı atmosfer mi?",
+"Fısıltı mı sessizlik mi?",
+"Dokunuş mu söz mü?"
+],
+
+/* ❤️ CİNSEL (ucu açık) */
 "Cinsel Sorular":[
 "Seni en çok ne başlatır?",
 "Romantik ortam önemli mi?",
-"Sınırların nerede başlıyor?",
+"Sınırların nerede başlar?",
 "Spontane mi planlı mı?",
-"Daha çok temas mı söz mü?",
-"En çok ne seni etkiler?"
+"En çok ne seni etkiler?",
+"Partnerinde ne ararsın?",
+"Güven mi tutku mu?",
+"Seni ne daha çok heyecanlandırır?",
+"Yakınlık senin için ne demek?",
+"Fantezi senin için ne ifade eder?"
 ],
 
+/* 😂 KOMİK */
+"Eğlenceli":[
+"Hangimiz daha çok saçmalar?",
+"Zombi olsa ilk kim kaçar?",
+"Kim daha kıskanç?",
+"Kim daha inatçı?",
+"Kim daha romantik değil?",
+"En utanç verici anın?",
+"Kim daha çok trip atar?",
+"Kim daha çok uyur?",
+"Kim daha çok konuşur?",
+"Kim daha çabuk sinirlenir?"
+],
+
+/* 🧠 DERİN */
+"Derin":[
+"Gerçek aşk sence nedir?",
+"Beni neden seviyorsun?",
+"Korkuların neler?",
+"Hayatındaki en büyük pişmanlık?",
+"Benimle ilgili en büyük düşüncen?",
+"İlişkide sadakat ne demek?",
+"Mutluluk senin için ne?",
+"Bir gün kaybedersek ne olur?",
+"Gerçekten mutlu musun?",
+"Hayat amacın ne?"
+],
+
+/* 🎯 TEST */
+"Tanıyor musun":[
+"En sevdiğim yemek?",
+"En büyük korkum?",
+"En sevdiğim renk?",
+"En sinir olduğum şey?",
+"Beni ne mutlu eder?",
+"Beni ne üzer?",
+"En sevdiğim aktivite?",
+"Ben nasıl biri oluyorum?",
+"En sevdiğim müzik?",
+"Beni en iyi anlatan şey?"
+],
+
+/* 💔 GERÇEKLİK */
 "Sert Sorular":[
 "İlişkimiz güçleniyor mu?",
-"Mutlu musun?",
+"Mutlu musun gerçekten?",
+"Aramızdaki çekim değişti mi?",
+"Beni hala aynı mı seviyorsun?",
+"Bir şeyleri zorluyor muyuz?",
 "Gerçekten doğru kişi miyim?",
+"Benden bir şey saklıyor musun?",
 "Beni kaybetmekten korkuyor musun?",
-"İlişkimizde eksik ne?"
+"İlişki nereye gidiyor?",
+"Açık mısın bana?"
+],
+
+/* 🎲 HIZLI */
+"Hızlı Tur":[
+"Evet mi hayır mı?",
+"Aşk mı para mı?",
+"Gece mi gündüz mü?",
+"Mesaj mı arama mı?",
+"Romantik mi eğlenceli mi?",
+"Sessizlik mi konuşma mı?",
+"Planlı mı spontane mi?",
+"Ev mi dışarı mı?",
+"Sadakat mi özgürlük mü?",
+"Tutku mu huzur mu?"
 ]
+
 };
 
-let current = [];
-let index = 0;
-let startX = 0;
+let current=[];
+let index=0;
+let startX=0;
+let player=1;
 
-// 2 kişilik mod
-let playerTurn = 1;
+const home=document.getElementById("home");
 
-const home = document.getElementById("home");
-
-for (let key in data) {
-  let div = document.createElement("div");
-  div.className = "category";
-  div.innerText = key;
-  div.onclick = () => openCategory(key);
-  home.appendChild(div);
+for(let key in data){
+let div=document.createElement("div");
+div.className="category";
+div.innerText=key;
+div.onclick=()=>openCategory(key);
+home.appendChild(div);
 }
 
-function shuffle(arr){
-  return arr.sort(()=>Math.random()-0.5);
-}
+function shuffle(a){return a.sort(()=>Math.random()-0.5);}
 
 function openCategory(name){
-  current = shuffle([...data[name]]);
-  index = 0;
-  playerTurn = 1;
+current=shuffle([...data[name]]);
+index=0;
+player=1;
 
-  home.style.display="none";
-  document.getElementById("questions").style.display="block";
-  document.getElementById("title").innerText=name;
+home.style.display="none";
+document.getElementById("questions").style.display="block";
+document.getElementById("title").innerText=name;
 
-  updatePlayer();
-  renderStack();
+updatePlayer();
+render();
 }
 
 function updatePlayer(){
-  document.getElementById("playerInfo").innerText =
-    "Sıra: Oyuncu " + playerTurn;
+document.getElementById("playerInfo").innerText="Sıra: Oyuncu "+player;
 }
 
 function switchPlayer(){
-  playerTurn = playerTurn === 1 ? 2 : 1;
-  updatePlayer();
+player = player===1?2:1;
+updatePlayer();
 }
 
-function renderStack(){
-  const area = document.getElementById("cardArea");
-  area.innerHTML="";
+function render(){
+const area=document.getElementById("cardArea");
+area.innerHTML="";
 
-  for(let i=0;i<3;i++){
-    let q = current[index+i];
-    if(!q) continue;
+for(let i=0;i<3;i++){
+let q=current[index+i];
+if(!q) continue;
 
-    let card = document.createElement("div");
-    card.className="card";
+let card=document.createElement("div");
+card.className="card";
 
-    if(i===0){
-      card.innerText=q;
-      addSwipe(card);
-    }
+if(i===0){
+card.innerText=q;
+addSwipe(card);
+}
 
-    area.appendChild(card);
-  }
+area.appendChild(card);
+}
 }
 
 function addSwipe(card){
-  card.addEventListener("touchstart",e=>{
-    startX=e.touches[0].clientX;
-  });
+card.addEventListener("touchstart",e=>{
+startX=e.touches[0].clientX;
+});
 
-  card.addEventListener("touchmove",e=>{
-    let moveX=e.touches[0].clientX-startX;
-    card.style.transform=`translateX(${moveX}px) rotate(${moveX/10}deg)`;
-  });
+card.addEventListener("touchmove",e=>{
+let x=e.touches[0].clientX-startX;
+card.style.transform=`translateX(${x}px) rotate(${x/10}deg)`;
+});
 
-  card.addEventListener("touchend",e=>{
-    let moveX=e.changedTouches[0].clientX-startX;
-
-    if(moveX>120) next();
-    else if(moveX<-120) prev();
-    else card.style.transform="";
-  });
+card.addEventListener("touchend",e=>{
+let x=e.changedTouches[0].clientX-startX;
+if(x>120) next();
+else if(x<-120) prev();
+else card.style.transform="";
+});
 }
 
-function next(){
-  animate(1);
-}
-function prev(){
-  animate(-1);
-}
+function next(){animate(1);}
+function prev(){animate(-1);}
 
 function animate(dir){
-  let card=document.querySelector(".card");
+let c=document.querySelector(".card");
+c.style.transform=`translateX(${dir*600}px) rotate(${dir*30}deg)`;
+c.style.opacity="0";
 
-  card.style.transform=`translateX(${dir*600}px) rotate(${dir*30}deg)`;
-  card.style.opacity="0";
-
-  setTimeout(()=>{
-    if(dir===1){
-      index = (index+1) % current.length;
-    } else {
-      index = (index-1+current.length) % current.length;
-    }
-
-    switchPlayer(); // oyuncu değiştir
-    renderStack();
-  },300);
+setTimeout(()=>{
+index = (index+dir+current.length)%current.length;
+switchPlayer();
+render();
+},300);
 }
 
 function goHome(){
-  home.style.display="block";
-  document.getElementById("questions").style.display="none";
-  document.getElementById("title").innerText="Kategoriler";
+home.style.display="block";
+document.getElementById("questions").style.display="none";
 }
-
 </script>
 
 </body>
-</html>
+  </html>
