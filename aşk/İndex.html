@@ -33,6 +33,11 @@ header {
   border-radius:12px;
   text-align:center;
   cursor:pointer;
+  transition:0.3s;
+}
+
+.category:hover {
+  transform:scale(1.05);
 }
 
 #cardArea {
@@ -47,13 +52,19 @@ header {
 .card {
   position:absolute;
   width:85%;
-  background:#111;
   padding:25px;
   border-radius:20px;
   text-align:center;
   font-size:18px;
   box-shadow:0 10px 30px rgba(255,0,0,0.3);
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  animation: float 2s infinite alternate;
+}
+
+/* Hafif nefes animasyonu */
+@keyframes float {
+  from { transform: scale(1); }
+  to { transform: scale(1.03); }
 }
 
 button {
@@ -64,6 +75,8 @@ button {
   border-radius:10px;
   margin:5px;
 }
+
+/* renk havuzu */
 </style>
 </head>
 
@@ -80,35 +93,56 @@ button {
 
 <script>
 
+const colors = [
+"#1a1a1a","#2b0000","#330000","#111","#220000",
+"#3a0a0a","#2a0000","#400000"
+];
+
+// SORULAR (arttırılmış)
 const data = {
-"Tiksinir misin": [
+
+"Tiksinir misin":[
 "Burnumu karıştırırken görsen tiksinir misin?",
 "Sabah nefesim kötü olsa söyler misin?",
 "Terlediğimde uzaklaşır mısın?",
-"Dağınık halimi sever misin?"
+"Dağınık halimi sever misin?",
+"Sivilcelerim çıksa ne hissedersin?",
+"Uykudan yeni kalkmış halimi beğenir misin?",
+"Çok hasta olsam bana bakar mısın?",
+"Ayaklarım koksa dürüst olur musun?"
 ],
 
-"Cesur +18": [
+"Cesur +18":[
 "Kontrol sende mi olmalı yoksa bende mi?",
 "Işıklar açık mı kapalı mı?",
 "Yavaş mı hızlı mı?",
-"Dokunuş mu sözler mi?",
-"Göz teması mı yoksa his mi?"
+"Göz teması mı yoksa his mi?",
+"Sürpriz mi planlı mı?",
+"Risk almayı sever misin?",
+"Dominant mı yoksa daha uyumlu musun?",
+"Anlık mı yoksa uzun uzun mu?"
 ],
 
-"Cinsel Sorular": [
+"Cinsel Sorular":[
 "Seni en çok ne başlatır?",
 "Romantik ortam önemli mi?",
 "Sınırların nerede başlıyor?",
 "Denemek isteyip söylemediğin bir şey var mı?",
-"Spontane mi planlı mı?"
+"Spontane mi planlı mı?",
+"Daha çok temas mı söz mü etkiler?",
+"Partnerinin seni anlaması mı yönlendirmesi mi?",
+"En çok ne seni etkiler?"
 ],
 
-"Sert Sorular": [
+"Sert Sorular":[
 "İlişkimiz güçleniyor mu?",
 "Mutlu musun?",
 "Aramızdaki çekim değişti mi?",
-"Gerçekten doğru kişi miyim?"
+"Gerçekten doğru kişi miyim?",
+"Beni kaybetmekten korkuyor musun?",
+"İlişkimizde eksik ne?",
+"Gerçekten açık mısın bana?",
+"Bir şeyleri zorluyor muyuz?"
 ]
 };
 
@@ -117,6 +151,15 @@ let index = 0;
 let startX = 0;
 let currentCard;
 
+// shuffle fonksiyonu
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+// kategorileri bas
 const home = document.getElementById("home");
 
 for (let key in data) {
@@ -128,11 +171,14 @@ for (let key in data) {
 }
 
 function openCategory(name) {
-  current = data[name];
+  current = [...data[name]];
+  shuffle(current); // KARMA
   index = 0;
+
   document.getElementById("home").style.display = "none";
   document.getElementById("questions").style.display = "block";
   document.getElementById("title").innerText = name;
+
   renderCard();
 }
 
@@ -143,6 +189,9 @@ function renderCard() {
   const card = document.createElement("div");
   card.className = "card";
   card.innerText = current[index];
+
+  // rastgele renk
+  card.style.background = colors[Math.floor(Math.random()*colors.length)];
 
   area.appendChild(card);
   currentCard = card;
@@ -158,25 +207,22 @@ function addSwipe(card) {
 
   card.addEventListener("touchmove", e => {
     let moveX = e.touches[0].clientX - startX;
-    card.style.transform = `translateX(${moveX}px) rotate(${moveX/10}deg)`;
+    card.style.transform = `translateX(${moveX}px) rotate(${moveX/12}deg) scale(1.05)`;
   });
 
   card.addEventListener("touchend", e => {
     let moveX = e.changedTouches[0].clientX - startX;
 
-    if (moveX > 100) {
-      swipeRight();
-    } else if (moveX < -100) {
-      swipeLeft();
-    } else {
-      card.style.transform = "";
-    }
+    if (moveX > 120) swipeRight();
+    else if (moveX < -120) swipeLeft();
+    else card.style.transform = "";
   });
 }
 
 function swipeRight() {
-  currentCard.style.transform = "translateX(500px) rotate(30deg)";
+  currentCard.style.transform = "translateX(600px) rotate(35deg)";
   currentCard.style.opacity = "0";
+
   setTimeout(() => {
     index = (index + 1) % current.length;
     renderCard();
@@ -184,8 +230,9 @@ function swipeRight() {
 }
 
 function swipeLeft() {
-  currentCard.style.transform = "translateX(-500px) rotate(-30deg)";
+  currentCard.style.transform = "translateX(-600px) rotate(-35deg)";
   currentCard.style.opacity = "0";
+
   setTimeout(() => {
     index = (index - 1 + current.length) % current.length;
     renderCard();
