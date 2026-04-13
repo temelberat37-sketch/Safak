@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Love Cards</title>
+<title>Love Game</title>
 
 <style>
 body {
@@ -33,11 +33,6 @@ header {
   border-radius:15px;
   text-align:center;
   cursor:pointer;
-  transition:0.3s;
-}
-
-.category:hover {
-  transform:scale(1.05);
 }
 
 #cardArea {
@@ -57,34 +52,30 @@ header {
   border-radius:25px;
   text-align:center;
   font-size:20px;
-
-  background: rgba(20, 0, 10, 0.95); /* OKUNAKLI */
-  backdrop-filter: blur(10px);
-
+  background: rgba(20,0,10,0.95);
   box-shadow:0 10px 40px rgba(0,0,0,0.5);
   transition:0.4s;
 }
 
-/* ALT KARTLAR - SADECE GÖRSEL */
-.card:nth-child(2) {
-  transform: scale(0.95) translateY(10px);
+/* ALT KARTLAR */
+.card:nth-child(2){
+  transform:scale(0.95) translateY(10px);
   opacity:0.4;
-  filter: blur(3px);
+  filter:blur(3px);
 }
-
-.card:nth-child(3) {
-  transform: scale(0.9) translateY(20px);
+.card:nth-child(3){
+  transform:scale(0.9) translateY(20px);
   opacity:0.2;
-  filter: blur(5px);
+  filter:blur(5px);
 }
 
-.buttons {
+.controls {
   position:absolute;
   bottom:20px;
   width:100%;
   display:flex;
   justify-content:center;
-  gap:20px;
+  gap:15px;
 }
 
 .btn {
@@ -94,11 +85,18 @@ header {
   border:none;
   font-size:22px;
   cursor:pointer;
-  box-shadow:0 5px 20px rgba(0,0,0,0.3);
 }
 
-.skip { background:#ff4d6d; }
-.like { background:#00e676; }
+.left { background:#ff4d6d; }
+.right { background:#00e676; }
+
+/* oyuncu gösterge */
+.player {
+  text-align:center;
+  margin-top:5px;
+  font-size:14px;
+  opacity:0.8;
+}
 
 </style>
 </head>
@@ -111,11 +109,14 @@ header {
 
 <div id="questions" style="display:none;">
   <button onclick="goHome()">⬅</button>
+
+  <div class="player" id="playerInfo"></div>
+
   <div id="cardArea"></div>
 
-  <div class="buttons">
-    <button class="btn skip" onclick="swipeLeft()">✖</button>
-    <button class="btn like" onclick="swipeRight()">❤</button>
+  <div class="controls">
+    <button class="btn left" onclick="prev()">⬅</button>
+    <button class="btn right" onclick="next()">➡</button>
   </div>
 </div>
 
@@ -129,7 +130,6 @@ const data = {
 "Göz teması mı yoksa his mi?",
 "Sürpriz mi planlı mı?",
 "Dominant mı yoksa daha uyumlu musun?",
-"Anı mı yaşarsın yoksa ortam mı önemli?",
 "Risk almayı sever misin?"
 ],
 
@@ -139,9 +139,7 @@ const data = {
 "Sınırların nerede başlıyor?",
 "Spontane mi planlı mı?",
 "Daha çok temas mı söz mü?",
-"En çok ne seni etkiler?",
-"Seni en çok ne heyecanlandırır?",
-"Partnerin seni nasıl daha iyi anlayabilir?"
+"En çok ne seni etkiler?"
 ],
 
 "Sert Sorular":[
@@ -149,10 +147,7 @@ const data = {
 "Mutlu musun?",
 "Gerçekten doğru kişi miyim?",
 "Beni kaybetmekten korkuyor musun?",
-"İlişkimizde eksik ne?",
-"Gerçekten açık mısın bana?",
-"Bir şeyleri zorluyor muyuz?",
-"Hala aynı heyecan var mı?"
+"İlişkimizde eksik ne?"
 ]
 };
 
@@ -160,9 +155,11 @@ let current = [];
 let index = 0;
 let startX = 0;
 
+// 2 kişilik mod
+let playerTurn = 1;
+
 const home = document.getElementById("home");
 
-// kategori oluştur
 for (let key in data) {
   let div = document.createElement("div");
   div.className = "category";
@@ -178,12 +175,24 @@ function shuffle(arr){
 function openCategory(name){
   current = shuffle([...data[name]]);
   index = 0;
+  playerTurn = 1;
 
   home.style.display="none";
   document.getElementById("questions").style.display="block";
   document.getElementById("title").innerText=name;
 
+  updatePlayer();
   renderStack();
+}
+
+function updatePlayer(){
+  document.getElementById("playerInfo").innerText =
+    "Sıra: Oyuncu " + playerTurn;
+}
+
+function switchPlayer(){
+  playerTurn = playerTurn === 1 ? 2 : 1;
+  updatePlayer();
 }
 
 function renderStack(){
@@ -197,12 +206,9 @@ function renderStack(){
     let card = document.createElement("div");
     card.className="card";
 
-    // SADECE ÜST KARTTA YAZI
-    if(i === 0){
-      card.innerText = q;
+    if(i===0){
+      card.innerText=q;
       addSwipe(card);
-    } else {
-      card.innerText = "";
     }
 
     area.appendChild(card);
@@ -210,7 +216,6 @@ function renderStack(){
 }
 
 function addSwipe(card){
-
   card.addEventListener("touchstart",e=>{
     startX=e.touches[0].clientX;
   });
@@ -223,17 +228,16 @@ function addSwipe(card){
   card.addEventListener("touchend",e=>{
     let moveX=e.changedTouches[0].clientX-startX;
 
-    if(moveX>120) swipeRight();
-    else if(moveX<-120) swipeLeft();
+    if(moveX>120) next();
+    else if(moveX<-120) prev();
     else card.style.transform="";
   });
 }
 
-function swipeRight(){
+function next(){
   animate(1);
 }
-
-function swipeLeft(){
+function prev(){
   animate(-1);
 }
 
@@ -244,8 +248,13 @@ function animate(dir){
   card.style.opacity="0";
 
   setTimeout(()=>{
-    index++;
-    if(index>=current.length) index=0;
+    if(dir===1){
+      index = (index+1) % current.length;
+    } else {
+      index = (index-1+current.length) % current.length;
+    }
+
+    switchPlayer(); // oyuncu değiştir
     renderStack();
   },300);
 }
@@ -259,4 +268,4 @@ function goHome(){
 </script>
 
 </body>
-</html>
+  </html>
