@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sevgili Soruları</title>
+
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background:#000;
+  color:white;
+  overflow:hidden;
+}
+
+header {
+  background:#111;
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.container {
+  padding:15px;
+}
+
+.category {
+  background:#b30000;
+  padding:15px;
+  margin:10px 0;
+  border-radius:12px;
+  text-align:center;
+  cursor:pointer;
+}
+
+#cardArea {
+  position:relative;
+  width:100%;
+  height:75vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.card {
+  position:absolute;
+  width:85%;
+  background:#111;
+  padding:25px;
+  border-radius:20px;
+  text-align:center;
+  font-size:18px;
+  box-shadow:0 10px 30px rgba(255,0,0,0.3);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+button {
+  background:red;
+  border:none;
+  color:white;
+  padding:10px 15px;
+  border-radius:10px;
+  margin:5px;
+}
+</style>
+</head>
+
+<body>
+
+<header id="title">Kategoriler</header>
+
+<div class="container" id="home"></div>
+
+<div id="questions" style="display:none;">
+  <button onclick="goHome()">⬅ Ana Sayfa</button>
+  <div id="cardArea"></div>
+</div>
+
+<script>
+
+const data = {
+"Tiksinir misin": [
+"Burnumu karıştırırken görsen tiksinir misin?",
+"Sabah nefesim kötü olsa söyler misin?",
+"Terlediğimde uzaklaşır mısın?",
+"Dağınık halimi sever misin?"
+],
+
+"Cesur +18": [
+"Kontrol sende mi olmalı yoksa bende mi?",
+"Işıklar açık mı kapalı mı?",
+"Yavaş mı hızlı mı?",
+"Dokunuş mu sözler mi?",
+"Göz teması mı yoksa his mi?"
+],
+
+"Cinsel Sorular": [
+"Seni en çok ne başlatır?",
+"Romantik ortam önemli mi?",
+"Sınırların nerede başlıyor?",
+"Denemek isteyip söylemediğin bir şey var mı?",
+"Spontane mi planlı mı?"
+],
+
+"Sert Sorular": [
+"İlişkimiz güçleniyor mu?",
+"Mutlu musun?",
+"Aramızdaki çekim değişti mi?",
+"Gerçekten doğru kişi miyim?"
+]
+};
+
+let current = [];
+let index = 0;
+let startX = 0;
+let currentCard;
+
+const home = document.getElementById("home");
+
+for (let key in data) {
+  let div = document.createElement("div");
+  div.className = "category";
+  div.innerText = key;
+  div.onclick = () => openCategory(key);
+  home.appendChild(div);
+}
+
+function openCategory(name) {
+  current = data[name];
+  index = 0;
+  document.getElementById("home").style.display = "none";
+  document.getElementById("questions").style.display = "block";
+  document.getElementById("title").innerText = name;
+  renderCard();
+}
+
+function renderCard() {
+  const area = document.getElementById("cardArea");
+  area.innerHTML = "";
+
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerText = current[index];
+
+  area.appendChild(card);
+  currentCard = card;
+
+  addSwipe(card);
+}
+
+function addSwipe(card) {
+
+  card.addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+  });
+
+  card.addEventListener("touchmove", e => {
+    let moveX = e.touches[0].clientX - startX;
+    card.style.transform = `translateX(${moveX}px) rotate(${moveX/10}deg)`;
+  });
+
+  card.addEventListener("touchend", e => {
+    let moveX = e.changedTouches[0].clientX - startX;
+
+    if (moveX > 100) {
+      swipeRight();
+    } else if (moveX < -100) {
+      swipeLeft();
+    } else {
+      card.style.transform = "";
+    }
+  });
+}
+
+function swipeRight() {
+  currentCard.style.transform = "translateX(500px) rotate(30deg)";
+  currentCard.style.opacity = "0";
+  setTimeout(() => {
+    index = (index + 1) % current.length;
+    renderCard();
+  }, 300);
+}
+
+function swipeLeft() {
+  currentCard.style.transform = "translateX(-500px) rotate(-30deg)";
+  currentCard.style.opacity = "0";
+  setTimeout(() => {
+    index = (index - 1 + current.length) % current.length;
+    renderCard();
+  }, 300);
+}
+
+function goHome() {
+  document.getElementById("home").style.display = "block";
+  document.getElementById("questions").style.display = "none";
+  document.getElementById("title").innerText = "Kategoriler";
+}
+
+</script>
+
+</body>
+  </html>
