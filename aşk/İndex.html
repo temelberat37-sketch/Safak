@@ -3,22 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sevgili Soruları</title>
+<title>Love Cards</title>
 
 <style>
 body {
   margin:0;
-  font-family: Arial;
-  background:#000;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg,#ff4d6d,#ff99ac);
   color:white;
   overflow:hidden;
 }
 
 header {
-  background:#111;
-  padding:15px;
   text-align:center;
-  font-size:20px;
+  padding:15px;
+  font-size:22px;
   font-weight:bold;
 }
 
@@ -27,10 +26,11 @@ header {
 }
 
 .category {
-  background:#b30000;
+  background:rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
   padding:15px;
   margin:10px 0;
-  border-radius:12px;
+  border-radius:15px;
   text-align:center;
   cursor:pointer;
   transition:0.3s;
@@ -43,7 +43,7 @@ header {
 #cardArea {
   position:relative;
   width:100%;
-  height:75vh;
+  height:65vh;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -53,30 +53,47 @@ header {
   position:absolute;
   width:85%;
   padding:25px;
-  border-radius:20px;
+  border-radius:25px;
   text-align:center;
-  font-size:18px;
-  box-shadow:0 10px 30px rgba(255,0,0,0.3);
-  transition: transform 0.4s ease, opacity 0.4s ease;
-  animation: float 2s infinite alternate;
+  font-size:20px;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter: blur(15px);
+  box-shadow:0 10px 40px rgba(0,0,0,0.3);
+  transition:0.4s;
 }
 
-/* Hafif nefes animasyonu */
-@keyframes float {
-  from { transform: scale(1); }
-  to { transform: scale(1.03); }
+/* arkadaki kart efekti */
+.card:nth-child(2) {
+  transform: scale(0.95) translateY(10px);
+  opacity:0.6;
+}
+.card:nth-child(3) {
+  transform: scale(0.9) translateY(20px);
+  opacity:0.4;
 }
 
-button {
-  background:red;
+.buttons {
+  position:absolute;
+  bottom:20px;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  gap:20px;
+}
+
+.btn {
+  width:60px;
+  height:60px;
+  border-radius:50%;
   border:none;
-  color:white;
-  padding:10px 15px;
-  border-radius:10px;
-  margin:5px;
+  font-size:22px;
+  cursor:pointer;
+  box-shadow:0 5px 20px rgba(0,0,0,0.3);
 }
 
-/* renk havuzu */
+.skip { background:#ff4d6d; }
+.like { background:#00e676; }
+
 </style>
 </head>
 
@@ -87,81 +104,52 @@ button {
 <div class="container" id="home"></div>
 
 <div id="questions" style="display:none;">
-  <button onclick="goHome()">⬅ Ana Sayfa</button>
+  <button onclick="goHome()">⬅</button>
   <div id="cardArea"></div>
+
+  <div class="buttons">
+    <button class="btn skip" onclick="swipeLeft()">✖</button>
+    <button class="btn like" onclick="swipeRight()">❤</button>
+  </div>
 </div>
 
 <script>
 
-const colors = [
-"#1a1a1a","#2b0000","#330000","#111","#220000",
-"#3a0a0a","#2a0000","#400000"
-];
-
-// SORULAR (arttırılmış)
 const data = {
-
-"Tiksinir misin":[
-"Burnumu karıştırırken görsen tiksinir misin?",
-"Sabah nefesim kötü olsa söyler misin?",
-"Terlediğimde uzaklaşır mısın?",
-"Dağınık halimi sever misin?",
-"Sivilcelerim çıksa ne hissedersin?",
-"Uykudan yeni kalkmış halimi beğenir misin?",
-"Çok hasta olsam bana bakar mısın?",
-"Ayaklarım koksa dürüst olur musun?"
-],
-
 "Cesur +18":[
 "Kontrol sende mi olmalı yoksa bende mi?",
 "Işıklar açık mı kapalı mı?",
 "Yavaş mı hızlı mı?",
 "Göz teması mı yoksa his mi?",
 "Sürpriz mi planlı mı?",
-"Risk almayı sever misin?",
-"Dominant mı yoksa daha uyumlu musun?",
-"Anlık mı yoksa uzun uzun mu?"
+"Dominant mı yoksa daha uyumlu musun?"
 ],
 
 "Cinsel Sorular":[
 "Seni en çok ne başlatır?",
 "Romantik ortam önemli mi?",
 "Sınırların nerede başlıyor?",
-"Denemek isteyip söylemediğin bir şey var mı?",
 "Spontane mi planlı mı?",
-"Daha çok temas mı söz mü etkiler?",
-"Partnerinin seni anlaması mı yönlendirmesi mi?",
+"Daha çok temas mı söz mü?",
 "En çok ne seni etkiler?"
 ],
 
 "Sert Sorular":[
 "İlişkimiz güçleniyor mu?",
 "Mutlu musun?",
-"Aramızdaki çekim değişti mi?",
 "Gerçekten doğru kişi miyim?",
 "Beni kaybetmekten korkuyor musun?",
-"İlişkimizde eksik ne?",
-"Gerçekten açık mısın bana?",
-"Bir şeyleri zorluyor muyuz?"
+"İlişkimizde eksik ne?"
 ]
 };
 
 let current = [];
 let index = 0;
 let startX = 0;
-let currentCard;
 
-// shuffle fonksiyonu
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
-
-// kategorileri bas
 const home = document.getElementById("home");
 
+// kategori oluştur
 for (let key in data) {
   let div = document.createElement("div");
   div.className = "category";
@@ -170,82 +158,85 @@ for (let key in data) {
   home.appendChild(div);
 }
 
-function openCategory(name) {
-  current = [...data[name]];
-  shuffle(current); // KARMA
+function shuffle(arr){
+  return arr.sort(()=>Math.random()-0.5);
+}
+
+function openCategory(name){
+  current = shuffle([...data[name]]);
   index = 0;
 
-  document.getElementById("home").style.display = "none";
-  document.getElementById("questions").style.display = "block";
-  document.getElementById("title").innerText = name;
+  home.style.display="none";
+  document.getElementById("questions").style.display="block";
+  document.getElementById("title").innerText=name;
 
-  renderCard();
+  renderStack();
 }
 
-function renderCard() {
+function renderStack(){
   const area = document.getElementById("cardArea");
-  area.innerHTML = "";
+  area.innerHTML="";
 
-  const card = document.createElement("div");
-  card.className = "card";
-  card.innerText = current[index];
+  for(let i=0;i<3;i++){
+    let q = current[index+i];
+    if(!q) continue;
 
-  // rastgele renk
-  card.style.background = colors[Math.floor(Math.random()*colors.length)];
+    let card = document.createElement("div");
+    card.className="card";
+    card.innerText=q;
 
-  area.appendChild(card);
-  currentCard = card;
+    if(i===0) addSwipe(card);
 
-  addSwipe(card);
+    area.appendChild(card);
+  }
 }
 
-function addSwipe(card) {
+function addSwipe(card){
 
-  card.addEventListener("touchstart", e => {
-    startX = e.touches[0].clientX;
+  card.addEventListener("touchstart",e=>{
+    startX=e.touches[0].clientX;
   });
 
-  card.addEventListener("touchmove", e => {
-    let moveX = e.touches[0].clientX - startX;
-    card.style.transform = `translateX(${moveX}px) rotate(${moveX/12}deg) scale(1.05)`;
+  card.addEventListener("touchmove",e=>{
+    let moveX=e.touches[0].clientX-startX;
+    card.style.transform=`translateX(${moveX}px) rotate(${moveX/10}deg)`;
   });
 
-  card.addEventListener("touchend", e => {
-    let moveX = e.changedTouches[0].clientX - startX;
+  card.addEventListener("touchend",e=>{
+    let moveX=e.changedTouches[0].clientX-startX;
 
-    if (moveX > 120) swipeRight();
-    else if (moveX < -120) swipeLeft();
-    else card.style.transform = "";
+    if(moveX>120) swipeRight();
+    else if(moveX<-120) swipeLeft();
+    else card.style.transform="";
   });
 }
 
-function swipeRight() {
-  currentCard.style.transform = "translateX(600px) rotate(35deg)";
-  currentCard.style.opacity = "0";
-
-  setTimeout(() => {
-    index = (index + 1) % current.length;
-    renderCard();
-  }, 300);
+function swipeRight(){
+  animate(1);
+}
+function swipeLeft(){
+  animate(-1);
 }
 
-function swipeLeft() {
-  currentCard.style.transform = "translateX(-600px) rotate(-35deg)";
-  currentCard.style.opacity = "0";
+function animate(dir){
+  let card=document.querySelector(".card");
+  card.style.transform=`translateX(${dir*600}px) rotate(${dir*30}deg)`;
+  card.style.opacity="0";
 
-  setTimeout(() => {
-    index = (index - 1 + current.length) % current.length;
-    renderCard();
-  }, 300);
+  setTimeout(()=>{
+    index++;
+    if(index>=current.length) index=0;
+    renderStack();
+  },300);
 }
 
-function goHome() {
-  document.getElementById("home").style.display = "block";
-  document.getElementById("questions").style.display = "none";
-  document.getElementById("title").innerText = "Kategoriler";
+function goHome(){
+  home.style.display="block";
+  document.getElementById("questions").style.display="none";
+  document.getElementById("title").innerText="Kategoriler";
 }
 
 </script>
 
 </body>
-</html>
+                                                       </html>
