@@ -204,7 +204,7 @@
             const user = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
 
-            if(user === 'admin' && pass === '1234') {
+            if(user === '' && pass === '') {
                 showNotif('Giriş Başarılı! Hoş geldin.', 'success');
                 document.getElementById('auth-page').style.display = 'none';
                 document.getElementById('app-page').style.display = 'flex';
