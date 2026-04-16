@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar">
+  <h3>Sunucular</h3>
+  <button onclick="createServer()">+ Oluştur</button>
+  <div id="servers"></div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <h2 id="welcome"></h2>
+    <button onclick="toggleTheme()">🌙 / ☀️</button>
+  </div>
+
+  <div class="box">
+    <input id="friendName" placeholder="Arkadaş ekle">
+    <button onclick="addFriend()">Ekle</button>
+    <div id="friends"></div>
+  </div>
+
+  <div class="box">
+    <div id="chat"></div>
+    <input id="message" placeholder="Mesaj yaz...">
+    <button onclick="sendMessage()">Gönder</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
