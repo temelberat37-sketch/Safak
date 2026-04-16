@@ -1,34 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chat</title>
+  <title>Chat App</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="sidebar">
-  <h3>Sunucular</h3>
-  <button onclick="createServer()">+ Oluştur</button>
-  <div id="servers"></div>
-</div>
+<div class="app">
 
-<div class="main">
-  <div class="topbar">
-    <h2 id="welcome"></h2>
-    <button onclick="toggleTheme()">🌙 / ☀️</button>
+  <!-- SOL SUNUCULAR -->
+  <div class="servers-bar">
+    <div class="server">A</div>
+    <div class="server">B</div>
+
+    <div class="server add" onclick="createServer()">+</div>
   </div>
 
-  <div class="box">
-    <input id="friendName" placeholder="Arkadaş ekle">
-    <button onclick="addFriend()">Ekle</button>
-    <div id="friends"></div>
+  <!-- SOL MENÜ (profil + arkadaşlar) -->
+  <div class="sidebar">
+
+    <div class="profile">
+      <div class="avatar">👤</div>
+      <div id="usernameDisplay"></div>
+    </div>
+
+    <div class="menu">
+      <div class="menu-item active">💬 DM</div>
+      <div class="menu-item">👥 Arkadaşlar</div>
+    </div>
+
+    <div class="friends-list" id="friends"></div>
+
   </div>
 
-  <div class="box">
+  <!-- ANA CHAT -->
+  <div class="main">
+
+    <div class="topbar">
+      <h3 id="chatTitle">Mesajlar</h3>
+      <button onclick="toggleTheme()">🌙</button>
+    </div>
+
     <div id="chat"></div>
-    <input id="message" placeholder="Mesaj yaz...">
-    <button onclick="sendMessage()">Gönder</button>
+
+    <div class="chat-input">
+      <input id="message" placeholder="Mesaj yaz...">
+      <button onclick="sendMessage()">➤</button>
+    </div>
+
   </div>
+
 </div>
 
 <script src="app.js"></script>
