@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -226,3 +227,413 @@
     </script>
 </body>
   </html>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora Adinda | Professional Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-darker: #0b0915;
+            --bg-dark: #120f25;
+            --bg-card: #1a162e;
+            --sidebar-width: 72px;
+            --list-width: 260px;
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --text-main: #ffffff;
+            --text-dim: #a1a1aa;
+            --error: #ef4444;
+            --success: #22c55e;
+            --border: #2d2847;
+            --online: #23a55a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); overflow: hidden; }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2d2847; border-radius: 10px; }
+
+        /* Notification */
+        #notification {
+            position: fixed; top: 20px; right: 20px; padding: 12px 24px;
+            border-radius: 12px; z-index: 10000; display: none;
+            color: white; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
+
+        /* Main Layout */
+        #app-wrapper { display: flex; height: 100vh; width: 100%; }
+        
+        /* Left Sidebar */
+        .sidebar { 
+            width: var(--sidebar-width); background: var(--bg-darker); 
+            display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 12px; flex-shrink: 0;
+        }
+        .icon-btn { 
+            width: 48px; height: 48px; border-radius: 50%; background: #25213d; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: 0.2s; color: var(--text-dim); position: relative;
+        }
+        .icon-btn:hover, .icon-btn.active { border-radius: 16px; background: var(--primary); color: white; }
+        .icon-btn.profile { border: 2px solid var(--primary); color: var(--primary); }
+
+        /* Navigation Panel */
+        .nav-panel { 
+            width: var(--list-width); background: var(--bg-card); display: flex; flex-direction: column;
+            border-right: 1px solid var(--border); flex-shrink: 0;
+        }
+        .nav-item {
+            margin: 4px 8px; padding: 10px 12px; border-radius: 6px;
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+            color: var(--text-dim); transition: 0.15s; font-weight: 500;
+        }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.06); color: white; }
+        .nav-item.active { color: white; background: rgba(139, 92, 246, 0.15); }
+
+        .list-header { padding: 18px 20px 8px 20px; font-size: 11px; font-weight: 800; color: var(--text-dim); letter-spacing: 0.5px; }
+
+        /* Avatars with Status */
+        .avatar-wrap { position: relative; flex-shrink: 0; }
+        .avatar-circle {
+            width: 32px; height: 32px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-weight: bold;
+            font-size: 13px; color: white;
+        }
+        .status-dot {
+            position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px;
+            border-radius: 50%; border: 2px solid var(--bg-card); background: var(--online);
+        }
+
+        /* Content Area */
+        .content-main { flex: 1; display: flex; flex-direction: column; background: #131026; overflow: hidden; }
+        
+        /* Header */
+        .top-bar { 
+            height: 48px; padding: 0 16px; display: flex; align-items: center; 
+            border-bottom: 1px solid var(--border); gap: 12px;
+        }
+        .top-bar-title { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; flex: 1; }
+
+        /* Friends View Modern */
+        .friends-container { flex: 1; display: flex; height: 100%; }
+        .friends-list-column { flex: 1; padding: 20px; overflow-y: auto; }
+        .activity-column { width: 340px; border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        
+        .friends-tabs { display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 20px; }
+        .tab { padding: 4px 10px; border-radius: 4px; cursor: pointer; color: var(--text-dim); font-size: 14px; font-weight: 500; }
+        .tab:hover { background: rgba(255,255,255,0.05); color: white; }
+        .tab.active { background: rgba(139, 92, 246, 0.2); color: white; }
+        .tab.add { background: var(--success); color: white; }
+
+        .friend-card {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px; border-radius: 8px; transition: 0.2s; border-top: 1px solid transparent;
+        }
+        .friend-card:hover { background: rgba(255,255,255,0.05); }
+        .friend-info { display: flex; align-items: center; gap: 12px; }
+        .friend-name { font-weight: 600; font-size: 14px; }
+        .friend-status-text { font-size: 12px; color: var(--text-dim); }
+        .friend-actions { display: flex; gap: 8px; }
+        .action-circle { 
+            width: 36px; height: 36px; border-radius: 50%; background: var(--bg-darker); 
+            display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dim);
+        }
+        .action-circle:hover { color: var(--primary); background: #1a162e; }
+
+        /* Chat System */
+        .chat-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .messages-scroll { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; }
+        
+        .message-row { display: flex; gap: 16px; position: relative; }
+        .message-row:hover .msg-pop-tools { opacity: 1; }
+        .msg-pop-tools { 
+            position: absolute; right: 20px; top: -12px; background: var(--bg-card); 
+            border: 1px solid var(--border); border-radius: 4px; display: flex; opacity: 0; transition: 0.1s;
+        }
+        .tool-btn { padding: 6px; cursor: pointer; color: var(--text-dim); }
+        .tool-btn:hover { color: white; background: var(--primary); }
+
+        .msg-meta { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+        .msg-user { font-weight: 700; font-size: 14px; color: var(--primary); }
+        .msg-date { font-size: 11px; color: var(--text-dim); font-weight: 400; }
+        .msg-content { color: #dbdee1; font-size: 15px; line-height: 1.4; word-break: break-all; }
+        .msg-reply-link { font-size: 12px; color: var(--primary); opacity: 0.8; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+
+        /* Input Area */
+        .chat-footer { padding: 0 20px 20px 20px; }
+        .reply-bar { 
+            background: #1e1b33; border-radius: 8px 8px 0 0; padding: 8px 16px; 
+            border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center;
+        }
+        .input-box {
+            background: #25213d; border-radius: 8px; display: flex; align-items: center; padding: 0 16px; gap: 12px;
+        }
+        .input-box input { 
+            flex: 1; background: transparent; border: none; padding: 12px 0; color: white; outline: none; font-size: 15px;
+        }
+
+        .activity-card {
+            background: var(--bg-darker); border-radius: 8px; padding: 16px;
+        }
+        .activity-card h4 { font-size: 13px; margin-bottom: 12px; color: var(--text-dim); }
+    </style>
+</head>
+<body>
+
+    <div id="notification"></div>
+
+    <div id="app-wrapper">
+        <!-- SIDEBAR -->
+        <nav class="sidebar">
+            <div class="icon-btn profile" onclick="showNotif('Profil Ayarları yakında!', 'primary')">NA</div>
+            <div class="icon-btn active" id="side-dm"><i data-lucide="message-square"></i></div>
+            <div class="icon-btn"><i data-lucide="compass"></i></div>
+            <div style="height: 1px; width: 32px; background: var(--border);"></div>
+            <div class="icon-btn" style="color: var(--success);"><i data-lucide="plus"></i></div>
+        </nav>
+
+        <!-- NAVIGATION PANEL -->
+        <aside class="nav-panel">
+            <div class="nav-item active" id="nav-friends" onclick="setView('friends')">
+                <i data-lucide="users" style="width: 20px;"></i>
+                <span>Arkadaşlar</span>
+            </div>
+            
+            <div class="list-header">DİREKT MESAJLAR</div>
+            <div id="dm-list-container">
+                <!-- Dinamik olarak yüklenecek -->
+            </div>
+        </aside>
+
+        <!-- CONTENT MAIN -->
+        <main class="content-main">
+            <!-- TOP BAR -->
+            <header class="top-bar">
+                <div class="top-bar-title" id="active-title">
+                    <i data-lucide="users" style="width: 20px; color: var(--text-dim);"></i>
+                    <span>Arkadaşlar</span>
+                </div>
+            </header>
+
+            <!-- FRIENDS VIEW -->
+            <div id="view-friends" class="friends-container">
+                <div class="friends-list-column">
+                    <div class="friends-tabs">
+                        <div class="tab active">Çevrimiçi</div>
+                        <div class="tab">Tümü</div>
+                        <div class="tab">Bekleyenler</div>
+                        <div class="tab">Engellenenler</div>
+                        <div class="tab add" onclick="showNotif('Arkadaş ekleme açıldı!', 'success')">Arkadaş Ekle</div>
+                    </div>
+                    <div class="section-title" style="font-size: 12px; font-weight: 700; color: var(--text-dim); margin-bottom: 15px;">ÇEVRİMİÇİ — 2</div>
+                    <div id="friends-list-root">
+                        <!-- Örnek Arkadaşlar -->
+                    </div>
+                </div>
+                <aside class="activity-column">
+                    <div class="activity-card">
+                        <h4>ŞU AN AKTİF</h4>
+                        <div style="font-size: 14px; font-weight: 600;">Eylül Ada</div>
+                        <div style="font-size: 12px; color: var(--text-dim);">Nexora Adinda Oynuyor</div>
+                    </div>
+                    <div class="activity-card" style="opacity: 0.5; border: 1px dashed var(--border); background: transparent; text-align: center;">
+                        <p style="font-size: 12px;">Henüz yeni bir aktivite yok.</p>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- CHAT VIEW -->
+            <div id="view-chat" class="chat-container" style="display: none;">
+                <div class="messages-scroll" id="messages-scroll-root">
+                    <!-- Mesajlar buraya akacak -->
+                </div>
+
+                <div class="chat-footer">
+                    <div id="reply-info" class="reply-bar" style="display: none;">
+                        <div style="font-size: 13px;"><span id="reply-to-user" style="font-weight: 700;"></span> yanıtlanıyor...</div>
+                        <i data-lucide="x" style="width: 14px; cursor: pointer;" onclick="cancelReply()"></i>
+                    </div>
+                    <div class="input-box">
+                        <i data-lucide="plus-circle" style="width: 24px; color: var(--text-dim); cursor: pointer;"></i>
+                        <input type="text" id="chat-input" placeholder="Mesaj gönder..." onkeydown="if(event.key==='Enter') sendMessage()">
+                        <div style="display: flex; gap: 15px; color: var(--text-dim);">
+                            <i data-lucide="gift" style="width: 20px; cursor: pointer;"></i>
+                            <i data-lucide="sticker" style="width: 20px; cursor: pointer;"></i>
+                            <i data-lucide="smile" style="width: 20px; cursor: pointer;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // State Management
+        let activeView = 'friends';
+        let activeDM = null;
+        let replyingTo = null;
+        let editingId = null;
+
+        // Data Storage
+        const users = [
+            { id: 'u1', name: 'Demir Alp', color: '#ff5e5e', status: 'Online' },
+            { id: 'u2', name: 'Eylül Ada', color: '#5e72ff', status: 'Online' },
+            { id: 'u3', name: 'Burak Can', color: '#22c55e', status: 'Offline' }
+        ];
+
+        const chatData = {
+            'u1': [
+                { id: 1, user: 'Demir Alp', text: 'Hey, Nexora projesinin yeni tasarımı çok sağlam olmuş!', time: 'Bugün 14:20', isMe: false },
+                { id: 2, user: 'Siz', text: 'Teşekkürler Demir! Mor tonlarını daha da iyileştirdim.', time: 'Bugün 14:22', isMe: true }
+            ],
+            'u2': [
+                { id: 3, user: 'Eylül Ada', text: 'Akşam Discord üzerinden toplantı yapacak mıyız?', time: 'Dün 20:15', isMe: false }
+            ],
+            'u3': []
+        };
+
+        // UI Handlers
+        function showNotif(msg, type) {
+            const n = document.getElementById('notification');
+            n.innerText = msg; n.style.display = 'block';
+            n.style.backgroundColor = type === 'success' ? 'var(--success)' : 'var(--primary)';
+            setTimeout(() => n.style.display = 'none', 3000);
+        }
+
+        function setView(view, userId = null) {
+            activeView = view;
+            const vFriends = document.getElementById('view-friends');
+            const vChat = document.getElementById('view-chat');
+            const navFriends = document.getElementById('nav-friends');
+            const headerTitle = document.getElementById('active-title');
+
+            if (view === 'friends') {
+                vFriends.style.display = 'flex';
+                vChat.style.display = 'none';
+                navFriends.classList.add('active');
+                headerTitle.innerHTML = `<i data-lucide="users" style="width: 20px; color: var(--text-dim);"></i><span>Arkadaşlar</span>`;
+                activeDM = null;
+                renderDMList();
+            } else {
+                activeDM = userId;
+                vFriends.style.display = 'none';
+                vChat.style.display = 'flex';
+                navFriends.classList.remove('active');
+                const user = users.find(u => u.id === userId);
+                headerTitle.innerHTML = `<i data-lucide="at-sign" style="width: 20px; color: var(--text-dim);"></i><span>${user.name}</span>`;
+                renderDMList();
+                renderChat();
+            }
+            lucide.createIcons();
+        }
+
+        function renderDMList() {
+            const container = document.getElementById('dm-list-container');
+            container.innerHTML = users.map(u => `
+                <div class="nav-item ${activeDM === u.id ? 'active' : ''}" onclick="setView('chat', '${u.id}')">
+                    <div class="avatar-wrap">
+                        <div class="avatar-circle" style="background: ${u.color}">${u.name[0]}</div>
+                        <div class="status-dot" style="background: ${u.status === 'Online' ? 'var(--online)' : '#666'}"></div>
+                    </div>
+                    <span>${u.name}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderFriends() {
+            const root = document.getElementById('friends-list-root');
+            root.innerHTML = users.map(u => `
+                <div class="friend-card">
+                    <div class="friend-info">
+                        <div class="avatar-wrap">
+                            <div class="avatar-circle" style="background: ${u.color}">${u.name[0]}</div>
+                            <div class="status-dot" style="background: ${u.status === 'Online' ? 'var(--online)' : '#666'}"></div>
+                        </div>
+                        <div>
+                            <div class="friend-name">${u.name}</div>
+                            <div class="friend-status-text">${u.status === 'Online' ? 'Çevrimiçi' : 'Çevrimdışı'}</div>
+                        </div>
+                    </div>
+                    <div class="friend-actions">
+                        <div class="action-circle" onclick="setView('chat', '${u.id}')"><i data-lucide="message-square" style="width: 18px;"></i></div>
+                        <div class="action-circle"><i data-lucide="more-vertical" style="width: 18px;"></i></div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderChat() {
+            const root = document.getElementById('messages-scroll-root');
+            const messages = chatData[activeDM] || [];
+            const user = users.find(u => u.id === activeDM);
+
+            root.innerHTML = messages.map(m => `
+                <div class="message-row">
+                    <div class="avatar-circle" style="background: ${m.isMe ? 'var(--primary)' : user.color}; width: 40px; height: 40px;">${m.user[0]}</div>
+                    <div style="flex: 1;">
+                        <div class="msg-meta">
+                            <span class="msg-user">${m.user}</span>
+                            <span class="msg-date">${m.time}</span>
+                        </div>
+                        <div class="msg-content">${m.text}</div>
+                    </div>
+                    <div class="msg-pop-tools">
+                        <div class="tool-btn" onclick="prepareReply('${m.user}', '${m.text}')"><i data-lucide="reply" style="width: 14px;"></i></div>
+                        ${m.isMe ? `
+                            <div class="tool-btn" onclick="prepareEdit(${m.id}, '${m.text}')"><i data-lucide="edit-3" style="width: 14px;"></i></div>
+                            <div class="tool-btn" onclick="deleteMessage(${m.id})"><i data-lucide="trash-2" style="width: 14px;"></i></div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            root.scrollTop = root.scrollHeight;
+            lucide.createIcons();
+        }
+
+        // Logic Functions
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const now = new Date();
+            const time = `Bugün ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+            if (editingId) {
+                const msg = chatData[activeDM].find(m => m.id === editingId);
+                msg.text = text;
+                editingId = null;
+                input.placeholder = "Mesaj gönder...";
+            } else {
+                let finalMsg = text;
+                if(replyingTo) {
+                    finalMsg = `<div class="msg-reply-link"><i data-lucide="corner-down-right" style="width: 12px;"></i>${replyingTo.user} kişisine yanıt olarak...</div> ${text}`;
+                }
+                
+                chatData[activeDM].push({
+                    id: Date.now(),
+                    user: 'Siz',
+                    text: finalMsg,
+                    time: time,
+                    isMe: true
+                });
+            }
+
+            input.value = '';
+            cancelReply();
+            renderChat();
+        }
+
+        function prepareReply(user, text) {
+            replyingTo
