@@ -43,19 +43,15 @@ function login() {
   }
 }
 
+// USERNAME
 if (currentUser) {
   let el = document.getElementById("usernameDisplay");
   if (el) el.innerText = currentUser.username;
 }
 
-// APP LOAD
-if (currentUser && document.getElementById("welcome")) {
-  welcome.innerText = "Hoş geldin " + currentUser.username;
-}
-
 // FRIEND
 function addFriend() {
-  currentUser.friends.push(friendName.value);
+  currentUser.friends.push(prompt("Arkadaş adı"));
   update();
 }
 
@@ -68,16 +64,16 @@ function createServer() {
 
 // MESSAGE
 function sendMessage() {
-  let f = currentUser.friends[0];
-  if (!f) return;
+  let friend = currentUser.friends[0];
+  if (!friend) return;
 
-  if (!currentUser.messages[f]) currentUser.messages[f] = [];
-  currentUser.messages[f].push(message.value);
+  if (!currentUser.messages[friend]) currentUser.messages[friend] = [];
+  currentUser.messages[friend].push(message.value);
 
   update();
 }
 
-// UPDATE UI
+// UPDATE
 function update() {
   save();
 
@@ -85,16 +81,10 @@ function update() {
     friends.innerHTML = currentUser.friends.map(f => `<p>${f}</p>`).join("");
   }
 
-  if (servers) {
-    servers.innerHTML = currentUser.servers.map(s => `<p>${s}</p>`).join("");
-  }
-
-  let f = currentUser.friends[0];
-  if (chat && f && currentUser.messages[f]) {
-    chat.innerHTML = currentUser.messages[f].map(m => `<p>${m}</p>`).join("");
+  let friend = currentUser.friends[0];
+  if (chat && friend && currentUser.messages[friend]) {
+    chat.innerHTML = currentUser.messages[friend].map(m => `<div class="msg">${m}</div>`).join("");
   }
 }
 
 update();
-
-
