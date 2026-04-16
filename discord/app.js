@@ -43,6 +43,11 @@ function login() {
   }
 }
 
+if (currentUser) {
+  let el = document.getElementById("usernameDisplay");
+  if (el) el.innerText = currentUser.username;
+}
+
 // APP LOAD
 if (currentUser && document.getElementById("welcome")) {
   welcome.innerText = "Hoş geldin " + currentUser.username;
@@ -91,3 +96,5 @@ function update() {
 }
 
 update();
+
+
