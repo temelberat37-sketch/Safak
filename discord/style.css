@@ -83,3 +83,114 @@ button {
   height: 200px;
   overflow-y: auto;
 }
+
+
+/* layout */
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* server bar */
+.servers-bar {
+  width: 70px;
+  background: #202225;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.server {
+  width: 50px;
+  height: 50px;
+  background: #5865f2;
+  margin: 5px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.server.add {
+  background: #3ba55d;
+}
+
+/* sidebar */
+.sidebar {
+  width: 220px;
+  background: var(--card);
+  padding: 10px;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: gray;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
+.menu-item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.menu-item.active {
+  background: var(--accent);
+  border-radius: 6px;
+}
+
+.friends-list p {
+  margin: 5px 0;
+}
+
+/* main */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  padding: 10px;
+  background: var(--card);
+  display: flex;
+  justify-content: space-between;
+}
+
+#chat {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+}
+
+.chat-input input {
+  flex: 1;
+}
+
+/* 📱 mobil */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .servers-bar {
+    width: 60px;
+  }
+  }
