@@ -1,8 +1,9 @@
 :root {
-  --bg: #1e1f22;
-  --card: #2b2d31;
-  --text: #fff;
-  --accent: #5865f2;
+  --bg: #0f0f14;
+  --card: #1a1b23;
+  --text: #ffffff;
+  --accent: #7c5cff;
+  --soft: #2a2b35;
 }
 
 body.light {
@@ -11,14 +12,18 @@ body.light {
   --text: #000;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
 }
 
-/* login */
+/* LOGIN */
 .center {
   display: flex;
   height: 100vh;
@@ -29,72 +34,46 @@ body {
 .card {
   background: var(--card);
   padding: 30px;
-  border-radius: 10px;
-  width: 300px;
+  border-radius: 15px;
+  width: 320px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+.card h2 {
   text-align: center;
 }
 
 input {
   width: 100%;
-  padding: 10px;
-  margin: 8px 0;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
   border: none;
-  border-radius: 6px;
+  background: var(--soft);
+  color: var(--text);
 }
 
 button {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
   background: var(--accent);
   color: white;
-  border: none;
-  border-radius: 6px;
   cursor: pointer;
 }
 
-/* app layout */
-.sidebar {
-  width: 200px;
-  height: 100vh;
-  background: var(--card);
-  float: left;
-  padding: 10px;
-}
-
-.main {
-  margin-left: 200px;
-  padding: 20px;
-}
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.box {
-  background: var(--card);
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-
-#chat {
-  height: 200px;
-  overflow-y: auto;
-}
-
-
-/* layout */
+/* APP LAYOUT */
 .app {
   display: flex;
   height: 100vh;
 }
 
-/* server bar */
-.servers-bar {
+/* SERVERS */
+.servers {
   width: 70px;
-  background: #202225;
+  background: #11121a;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -104,12 +83,12 @@ button {
 .server {
   width: 50px;
   height: 50px;
-  background: #5865f2;
-  margin: 5px 0;
+  margin: 6px 0;
+  background: var(--accent);
+  border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 15px;
   cursor: pointer;
 }
 
@@ -117,9 +96,9 @@ button {
   background: #3ba55d;
 }
 
-/* sidebar */
+/* SIDEBAR */
 .sidebar {
-  width: 220px;
+  width: 230px;
   background: var(--card);
   padding: 10px;
 }
@@ -133,29 +112,34 @@ button {
 .avatar {
   width: 40px;
   height: 40px;
-  background: gray;
+  background: var(--accent);
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .menu-item {
-  padding: 8px;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 6px;
   cursor: pointer;
+}
+
+.menu-item:hover {
+  background: var(--soft);
 }
 
 .menu-item.active {
   background: var(--accent);
-  border-radius: 6px;
 }
 
-.friends-list p {
+.friends p {
   margin: 5px 0;
 }
 
-/* main */
+/* MAIN */
 .main {
   flex: 1;
   display: flex;
@@ -169,28 +153,40 @@ button {
   justify-content: space-between;
 }
 
-#chat {
+.chat {
   flex: 1;
   padding: 10px;
   overflow-y: auto;
 }
 
-.chat-input {
+.msg {
+  background: var(--soft);
+  padding: 8px;
+  border-radius: 8px;
+  margin: 5px 0;
+}
+
+.input-area {
   display: flex;
   padding: 10px;
 }
 
-.chat-input input {
+.input-area input {
   flex: 1;
 }
 
-/* 📱 mobil */
+.input-area button {
+  width: auto;
+  margin-left: 5px;
+}
+
+/* MOBILE */
 @media (max-width: 768px) {
   .sidebar {
     display: none;
   }
 
-  .servers-bar {
+  .servers {
     width: 60px;
   }
   }
