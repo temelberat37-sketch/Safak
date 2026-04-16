@@ -1,51 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chat App</title>
+  <title>Chat</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app">
 
-  <!-- SOL SUNUCULAR -->
-  <div class="servers-bar">
+  <!-- servers -->
+  <div class="servers">
     <div class="server">A</div>
     <div class="server">B</div>
-
     <div class="server add" onclick="createServer()">+</div>
   </div>
 
-  <!-- SOL MENÜ (profil + arkadaşlar) -->
+  <!-- sidebar -->
   <div class="sidebar">
-
     <div class="profile">
       <div class="avatar">👤</div>
       <div id="usernameDisplay"></div>
     </div>
 
-    <div class="menu">
-      <div class="menu-item active">💬 DM</div>
-      <div class="menu-item">👥 Arkadaşlar</div>
-    </div>
+    <div class="menu-item active">💬 DM</div>
+    <div class="menu-item">👥 Arkadaşlar</div>
 
-    <div class="friends-list" id="friends"></div>
-
+    <div class="friends" id="friends"></div>
   </div>
 
-  <!-- ANA CHAT -->
+  <!-- main -->
   <div class="main">
 
     <div class="topbar">
-      <h3 id="chatTitle">Mesajlar</h3>
+      <h3>Mesajlar</h3>
       <button onclick="toggleTheme()">🌙</button>
     </div>
 
-    <div id="chat"></div>
+    <div class="chat" id="chat"></div>
 
-    <div class="chat-input">
+    <div class="input-area">
       <input id="message" placeholder="Mesaj yaz...">
-      <button onclick="sendMessage()">➤</button>
+      <button onclick="sendMessage()">Gönder</button>
     </div>
 
   </div>
