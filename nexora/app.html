@@ -5,92 +5,98 @@
 <title>Nexora App</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial;background:#1a0f2e;color:#fff;display:flex;height:100vh;overflow:hidden}/* SIDEBAR */ .sidebar{ width:80px; background:#120a24; display:flex; flex-direction:column; align-items:center; padding:10px 0; gap:12px; overflow-y:auto } .server{ width:50px;height:50px; background:#2a1748; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.2s; position:relative; user-select:none; } .server:hover{background:#6a3df0} .server:active{transform:scale(0.95)}
+body{margin:0;font-family:Arial;background:#1a0f2e;color:#fff;overflow:hidden;height:100vh;display:flex}/* LEFT BAR */ .leftbar{ width:90px; background:#120a24; display:flex; flex-direction:column; align-items:center; padding:10px 0; gap:10px; }
 
-.badge{ position:absolute; bottom:-3px;right:-3px; background:#6a3df0; font-size:10px; padding:2px 4px; border-radius:10px; }
+.menuBtns{ display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
 
-/* MAIN */ .main{flex:1;display:flex;overflow:hidden}
+.menuBtn{ width:44px; height:44px; border-radius:50%; background:#2a1748; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:11px; transition:.2s; } .menuBtn:hover{transform:scale(1.05);background:#6a3df0}
 
-.channels{ width:240px; background:#2a1748; padding:10px; overflow-y:auto } .channel{padding:8px;border-radius:6px;cursor:pointer;margin:4px 0} .channel:hover{background:#6a3df0}
+.servers{ flex:1; display:flex; flex-direction:column; align-items:center; gap:10px; overflow-y:auto; }
 
-.chat{ flex:1; display:flex; flex-direction:column; }
+.server{ width:46px; height:46px; border-radius:50%; background:#2a1748; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; font-size:12px; } .server:hover{background:#6a3df0}
 
-.messages{ flex:1; padding:15px; overflow-y:auto }
+.badge{ position:absolute; bottom:-3px; right:-3px; background:#6a3df0; font-size:10px; padding:2px 4px; border-radius:10px; }
 
-.message{ margin-bottom:10px; padding:6px; border-radius:8px; position:relative; background:rgba(255,255,255,0.03) }
+.plusBtn{ width:46px; height:46px; border-radius:50%; background:#6a3df0; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; margin-top:10px; }
 
-.message:hover .msg-menu{display:block}
+/* CHANNEL PANEL */ .channels{ width:240px; background:#2a1748; padding:10px; overflow-y:auto; display:block; transition:.3s; }
 
-.msg-menu{ position:absolute; right:8px;top:6px; display:none; cursor:pointer }
+.channels.hidden{ width:0; padding:0; overflow:hidden; }
 
-.input{ padding:10px; background:#2a1748 }
+.channel{ padding:8px; border-radius:6px; cursor:pointer; margin:4px 0; } .channel:hover{background:#6a3df0}
 
-.input input{ width:100%;padding:12px;border:none;border-radius:8px;background:#1a0f2e;color:#fff }
+/* CHAT */ .chat{ flex:1; display:flex; flex-direction:column; }
 
-.users{ width:220px; background:#2a1748; padding:10px; overflow-y:auto }
+.messages{ flex:1; padding:15px; overflow-y:auto; }
+
+.message{ margin-bottom:10px; padding:8px; border-radius:8px; background:rgba(255,255,255,0.03); position:relative; }
+
+.message:hover{background:rgba(255,255,255,0.06)}
+
+.msg-actions{ position:absolute; right:8px; top:5px; cursor:pointer; }
+
+.input{ padding:10px; background:#2a1748; display:flex; gap:8px; }
+
+.input input{ flex:1; padding:12px; border:none; border-radius:8px; background:#1a0f2e; color:#fff; }
+
+.input button{ background:#6a3df0; border:none; color:#fff; padding:10px 14px; border-radius:8px; cursor:pointer; }
+
+/* USERS */ .users{ width:220px; background:#2a1748; padding:10px; overflow-y:auto; }
 
 .user{padding:5px;border-radius:6px;margin:4px 0} .admin{color:#ff6bff} .member{color:#b084ff}
 
-/* MODAL */ .modal{ position:fixed; top:0;left:0; width:100%;height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center } .modal-content{ background:#2a1748; padding:20px; border-radius:10px; width:260px } .modal button{ width:100%;margin:5px 0;padding:10px;border:none;border-radius:6px;cursor:pointer;background:#6a3df0;color:#fff }
+/* MODAL */ .modal{ position:fixed; top:0;left:0; width:100%;height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; }
 
-/* MOBILE */ @media(max-width:900px){ .channels{display:none} .users{display:none} .sidebar{width:60px} }
+.modal-content{ background:#2a1748; padding:20px; border-radius:10px; width:280px; }
 
-</style>
+.modal button{ width:100%; margin:5px 0; padding:10px; border:none; border-radius:6px; background:#6a3df0; color:#fff; cursor:pointer; }
+
+@media(max-width:900px){ .channels,.users{display:none} .leftbar{width:80px} } </style>
+
 </head>
-<body><!-- SIDEBAR --><div class="sidebar" id="serverList"></div><!-- MAIN --><div class="main"><div class="channels" id="channels"></div><div class="chat">
+<body><!-- LEFT BAR --><div class="leftbar"><div class="menuBtns">
+<div class="menuBtn" onclick="showServers()">S</div>
+<div class="menuBtn" onclick="showDM()">DM</div>
+<div class="menuBtn" onclick="showFriends()">F</div>
+<div class="menuBtn" onclick="showProfile()">P</div>
+</div><div class="servers" id="serverList"></div><div class="plusBtn" onclick="openCreateModal()">+</div></div><!-- CHANNELS --><div class="channels" id="channels"></div><!-- CHAT --><div class="chat">
 <div class="messages" id="messages"></div>
-<div class="input"><input placeholder="Mesaj yaz..."></div>
-</div><div class="users" id="users"></div></div><!-- MODAL --><div class="modal" id="modal">
+<div class="input">
+<input id="msgInput" placeholder="Mesaj yaz...">
+<button onclick="sendMsg()">Gönder</button>
+</div>
+</div><!-- USERS --><div class="users" id="users"></div><!-- MODAL --><div class="modal" id="modal">
 <div class="modal-content">
 <h3 id="modalTitle">Sunucu</h3>
-<button>Sunucudan Çık</button>
-<button>Üye Sayısı: 14</button>
-<button>Aktif Üye: 6</button>
+<button onclick="alert('Sunucudan çıkıldı')">Sunucudan Çık</button>
+<button id="memberCount"></button>
+<button id="activeCount"></button>
 <button onclick="closeModal()">Kapat</button>
 </div>
+</div><!-- CREATE MODAL --><div class="modal" id="createModal">
+<div class="modal-content">
+<h3>Sunucu Oluştur / Katıl</h3>
+<button onclick="alert('Sunucu oluşturuldu')">Sunucu Oluştur</button>
+<button onclick="alert('Kod ile katıldın')">Kod ile Katıl</button>
+<button onclick="closeCreateModal()">Kapat</button>
+</div>
 </div><script>
-const servers=[
-{
-name:"Nexora Hub",badge:12,
-channels:["genel","sohbet","duyuru"],
-users:generateUsers(15),
-messages:{
-"genel":[
-{user:"Admin",role:"admin",text:"Nexora'ya hoşgeldiniz"},
-{user:"Ali",role:"member",text:"Selam!"},
-{user:"Zeynep",role:"member",text:"Nasılsınız?"}
-]
-}
-},
-{
-name:"Oyun Dünyası",badge:8,
-channels:["valorant","lol","csgo"],
-users:generateUsers(12),
-messages:{"valorant":[{user:"Efe",role:"member",text:"Rank atıyor muyuz?"}]}
-},
-{
-name:"Kod Topluluğu",badge:20,
-channels:["js","html","css"],
-users:generateUsers(18),
-messages:{"js":[{user:"Dev",role:"admin",text:"React öğreniyorum"}]}
-}
-];
-
-function generateUsers(n){
-let arr=[];
-for(let i=0;i<n;i++){
-arr.push({name:"User"+i,role:i%5==0?"admin":"member"});
-}
-return arr;
-}
-
 let currentServer=0;
 let currentChannel="genel";
+let currentView="server";
+
+const servers=[
+{name:"Nexora Hub",badge:5,channels:["genel","sohbet"],users:genUsers(15),messages:{"genel":[{user:"Admin",role:"admin",text:"Hoşgeldiniz"},{user:"Ali",role:"member",text:"Selam"}]}},
+{name:"Oyun Dünyası",badge:3,channels:["valorant","lol"],users:genUsers(12),messages:{"valorant":[{user:"Efe",role:"member",text:"Rank atalım"}]}},
+{name:"Kod Topluluğu",badge:7,channels:["js","html"],users:genUsers(18),messages:{"js":[{user:"Dev",role:"admin",text:"JS öğreniyorum"}]}}
+];
+
+function genUsers(n){let a=[];for(let i=0;i<n;i++)a.push({name:"User"+i,role:i%4==0?"admin":"member"});return a;}
 
 function renderServers(){
 let html="";
 servers.forEach((s,i)=>{
-html+=`<div class='server' onclick='loadServer(${i})' oncontextmenu='openModal(${i});return false;'>${s.name[0]}<div class='badge'>${s.badge}</div></div>`;
+html+=`<div class='server' onclick='loadServer(${i})'>${s.name[0]}<div class='badge'>${s.badge}</div></div>`;
 });
 document.getElementById("serverList").innerHTML=html;
 }
@@ -105,49 +111,46 @@ loadChannel(servers[i].channels[0]);
 function renderChannels(){
 let s=servers[currentServer];
 let html="<h3>Kanallar</h3>";
-s.channels.forEach(c=>{
-html+=`<div class='channel' onclick="loadChannel('${c}')"># ${c}</div>`;
-});
+s.channels.forEach(c=>html+=`<div class='channel' onclick="loadChannel('${c}')"># ${c}</div>`);
 document.getElementById("channels").innerHTML=html;
 }
 
 function loadChannel(name){
 currentChannel=name;
-let msgs=servers[currentServer].messages[name]||generateFake();
+let msgs=servers[currentServer].messages[name]||[];
 let html="";
 msgs.forEach(m=>{
-html+=`<div class='message'><b class='${m.role}'>${m.user}</b>: ${m.text}<div class='msg-menu'>⋮</div></div>`;
+html+=`<div class='message'><b class='${m.role}'>${m.user}</b>: ${m.text}<div class='msg-actions'>⋮</div></div>`;
 });
 document.getElementById("messages").innerHTML=html;
 }
 
-function generateFake(){
-return[
-{user:"Ahmet",role:"member",text:"Selam"},
-{user:"Mehmet",role:"member",text:"Naber"},
-{user:"Elif",role:"member",text:"Discord gibi olmuş"}
-];
+function sendMsg(){
+let v=document.getElementById("msgInput").value;
+if(!v)return;
+servers[currentServer].messages[currentChannel].push({user:"Sen",role:"member",text:v});
+document.getElementById("msgInput").value="";
+loadChannel(currentChannel);
 }
 
 function renderUsers(){
 let u=servers[currentServer].users;
 let html="<h3>Kullanıcılar</h3>";
-u.forEach(x=>{
-html+=`<div class='user ${x.role}'>${x.name}</div>`;
-});
+u.forEach(x=>html+=`<div class='user ${x.role}'>${x.name}</div>`);
 document.getElementById("users").innerHTML=html;
 }
 
-function openModal(i){
-document.getElementById("modal").style.display="flex";
-document.getElementById("modalTitle").innerText=servers[i].name;
-}
+/* VIEW BUTTONS */
+function showServers(){loadServer(0)}
+function showDM(){alert("DM açıldı")}
+function showFriends(){alert("Arkadaşlar")}
+function showProfile(){alert("Profil")}
 
-function closeModal(){
-document.getElementById("modal").style.display="none";
-}
+/* MODALS */
+function openCreateModal(){document.getElementById("createModal").style.display="flex"}
+function closeCreateModal(){document.getElementById("createModal").style.display="none"}
+function closeModal(){document.getElementById("modal").style.display="none"}
 
-renderServers();
-loadServer(0);
+renderServers();loadServer(0);
 </script></body>
 </html>
