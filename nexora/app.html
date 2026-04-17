@@ -4,153 +4,140 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nexora App</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial;background:#1a0f2e;color:#fff;overflow:hidden;height:100vh;display:flex}/* LEFT BAR */ .leftbar{ width:90px; background:#120a24; display:flex; flex-direction:column; align-items:center; padding:10px 0; gap:10px; }
+*{box-sizing:border-box}body{ margin:0; font-family:Arial; background:#1a0f2e; color:#fff; height:100vh; overflow:hidden; display:flex; }
 
-.menuBtns{ display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
+/* LAYOUT WRAPPER */ .app{ display:flex; width:100%; height:100%; }
 
-.menuBtn{ width:44px; height:44px; border-radius:50%; background:#2a1748; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:11px; transition:.2s; } .menuBtn:hover{transform:scale(1.05);background:#6a3df0}
+/* LEFT BAR */ .leftbar{ width:78px; background:#120a24; display:flex; flex-direction:column; align-items:center; padding:10px 0; gap:10px; }
+
+.menuBtns{ display:flex; flex-direction:column; gap:10px; }
+
+.menuBtn{ width:44px; height:44px; border-radius:50%; background:#2a1748; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; } .menuBtn:hover{background:#6a3df0}
 
 .servers{ flex:1; display:flex; flex-direction:column; align-items:center; gap:10px; overflow-y:auto; }
 
-.server{ width:46px; height:46px; border-radius:50%; background:#2a1748; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; font-size:12px; } .server:hover{background:#6a3df0}
+.server{ width:46px; height:46px; border-radius:50%; background:#2a1748; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; position:relative; }
 
-.badge{ position:absolute; bottom:-3px; right:-3px; background:#6a3df0; font-size:10px; padding:2px 4px; border-radius:10px; }
+.server:hover{background:#6a3df0}
 
-.plusBtn{ width:46px; height:46px; border-radius:50%; background:#6a3df0; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; margin-top:10px; }
+.badge{ position:absolute; bottom:-4px; right:-4px; background:#6a3df0; font-size:10px; padding:2px 4px; border-radius:10px; }
 
-/* CHANNEL PANEL */ .channels{ width:240px; background:#2a1748; padding:10px; overflow-y:auto; display:block; transition:.3s; }
+.plus{ width:46px; height:46px; border-radius:50%; background:#6a3df0; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; margin-top:10px; }
 
-.channels.hidden{ width:0; padding:0; overflow:hidden; }
+/* CHANNEL PANEL */ .channels{ width:260px; background:#2a1748; padding:10px; overflow-y:auto; transition:.3s; }
 
-.channel{ padding:8px; border-radius:6px; cursor:pointer; margin:4px 0; } .channel:hover{background:#6a3df0}
+.channel{ padding:8px; border-radius:6px; cursor:pointer; margin:4px 0; }
+
+.channel:hover{background:#6a3df0}
 
 /* CHAT */ .chat{ flex:1; display:flex; flex-direction:column; }
 
-.messages{ flex:1; padding:15px; overflow-y:auto; }
+.messages{ flex:1; padding:12px; overflow-y:auto; }
 
-.message{ margin-bottom:10px; padding:8px; border-radius:8px; background:rgba(255,255,255,0.03); position:relative; }
+.message{ background:rgba(255,255,255,0.03); padding:8px; border-radius:8px; margin-bottom:8px; }
 
-.message:hover{background:rgba(255,255,255,0.06)}
-
-.msg-actions{ position:absolute; right:8px; top:5px; cursor:pointer; }
-
-.input{ padding:10px; background:#2a1748; display:flex; gap:8px; }
+.input{ display:flex; padding:10px; gap:8px; background:#2a1748; }
 
 .input input{ flex:1; padding:12px; border:none; border-radius:8px; background:#1a0f2e; color:#fff; }
 
-.input button{ background:#6a3df0; border:none; color:#fff; padding:10px 14px; border-radius:8px; cursor:pointer; }
+.input button{ background:#6a3df0; border:none; color:#fff; padding:10px 14px; border-radius:8px; }
 
 /* USERS */ .users{ width:220px; background:#2a1748; padding:10px; overflow-y:auto; }
 
-.user{padding:5px;border-radius:6px;margin:4px 0} .admin{color:#ff6bff} .member{color:#b084ff}
+.user{padding:5px;margin:4px 0;border-radius:6px} .admin{color:#ff6bff} .member{color:#b084ff}
 
-/* MODAL */ .modal{ position:fixed; top:0;left:0; width:100%;height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; }
+/* MOBILE RESPONSIVE (FULL FIX) */ @media(max-width:900px){
 
-.modal-content{ background:#2a1748; padding:20px; border-radius:10px; width:280px; }
+.leftbar{ width:60px; }
 
-.modal button{ width:100%; margin:5px 0; padding:10px; border:none; border-radius:6px; background:#6a3df0; color:#fff; cursor:pointer; }
+.channels{ position:fixed; left:60px; top:0; bottom:0; width:0; overflow:hidden; transition:.3s; z-index:10; }
 
-@media(max-width:900px){ .channels,.users{display:none} .leftbar{width:80px} } </style>
+.channels.open{ width:220px; }
 
+.users{ display:none; }
+
+.chat{ flex:1; }
+
+.menuBtn{ width:38px; height:38px; font-size:10px; }
+
+.server{ width:40px; height:40px; } }
+
+</style>
 </head>
-<body><!-- LEFT BAR --><div class="leftbar"><div class="menuBtns">
-<div class="menuBtn" onclick="showServers()">S</div>
+<body><div class="app"><!-- LEFT BAR --><div class="leftbar"><div class="menuBtns">
+<div class="menuBtn" onclick="toggleChannels()">☰</div>
 <div class="menuBtn" onclick="showDM()">DM</div>
 <div class="menuBtn" onclick="showFriends()">F</div>
 <div class="menuBtn" onclick="showProfile()">P</div>
-</div><div class="servers" id="serverList"></div><div class="plusBtn" onclick="openCreateModal()">+</div></div><!-- CHANNELS --><div class="channels" id="channels"></div><!-- CHAT --><div class="chat">
+</div><div class="servers" id="servers"></div><div class="plus" onclick="openCreate()">+</div></div><!-- CHANNELS --><div class="channels" id="channels"></div><!-- CHAT --><div class="chat">
 <div class="messages" id="messages"></div>
 <div class="input">
-<input id="msgInput" placeholder="Mesaj yaz...">
-<button onclick="sendMsg()">Gönder</button>
+<input id="msg" placeholder="Mesaj yaz...">
+<button onclick="send()">Gönder</button>
 </div>
-</div><!-- USERS --><div class="users" id="users"></div><!-- MODAL --><div class="modal" id="modal">
-<div class="modal-content">
-<h3 id="modalTitle">Sunucu</h3>
-<button onclick="alert('Sunucudan çıkıldı')">Sunucudan Çık</button>
-<button id="memberCount"></button>
-<button id="activeCount"></button>
-<button onclick="closeModal()">Kapat</button>
-</div>
-</div><!-- CREATE MODAL --><div class="modal" id="createModal">
-<div class="modal-content">
-<h3>Sunucu Oluştur / Katıl</h3>
-<button onclick="alert('Sunucu oluşturuldu')">Sunucu Oluştur</button>
-<button onclick="alert('Kod ile katıldın')">Kod ile Katıl</button>
-<button onclick="closeCreateModal()">Kapat</button>
-</div>
-</div><script>
-let currentServer=0;
-let currentChannel="genel";
-let currentView="server";
-
+</div><!-- USERS --><div class="users" id="users"></div></div><script>
 const servers=[
-{name:"Nexora Hub",badge:5,channels:["genel","sohbet"],users:genUsers(15),messages:{"genel":[{user:"Admin",role:"admin",text:"Hoşgeldiniz"},{user:"Ali",role:"member",text:"Selam"}]}},
-{name:"Oyun Dünyası",badge:3,channels:["valorant","lol"],users:genUsers(12),messages:{"valorant":[{user:"Efe",role:"member",text:"Rank atalım"}]}},
-{name:"Kod Topluluğu",badge:7,channels:["js","html"],users:genUsers(18),messages:{"js":[{user:"Dev",role:"admin",text:"JS öğreniyorum"}]}}
+{name:"Nexora",badge:3,channels:["genel","sohbet"],users:gen(12),messages:{"genel":[{u:"Admin",t:"Hoşgeldin"},{u:"Ali",t:"Selam"}]}},
+{name:"Oyun",badge:5,channels:["lol","valo"],users:gen(10),messages:{"lol":[{u:"Efe",t:"Rank?"}]}},
+{name:"Kod",badge:7,channels:["js","html"],users:gen(15),messages:{"js":[{u:"Dev",t:"JS iyi"}]}}
 ];
 
-function genUsers(n){let a=[];for(let i=0;i<n;i++)a.push({name:"User"+i,role:i%4==0?"admin":"member"});return a;}
+let s=0,c="genel";
+
+function gen(n){return Array.from({length:n},(_,i)=>({name:"User"+i,role:i%3?"member":"admin"}))}
 
 function renderServers(){
-let html="";
-servers.forEach((s,i)=>{
-html+=`<div class='server' onclick='loadServer(${i})'>${s.name[0]}<div class='badge'>${s.badge}</div></div>`;
-});
-document.getElementById("serverList").innerHTML=html;
+let h="";
+servers.forEach((x,i)=>h+=`<div class='server' onclick='load(${i})'>${x.name[0]}<div class='badge'>${x.badge}</div></div>`);
+document.getElementById("servers").innerHTML=h;
 }
 
-function loadServer(i){
-currentServer=i;
+function load(i){
+s=i;
 renderChannels();
 renderUsers();
 loadChannel(servers[i].channels[0]);
 }
 
 function renderChannels(){
-let s=servers[currentServer];
-let html="<h3>Kanallar</h3>";
-s.channels.forEach(c=>html+=`<div class='channel' onclick="loadChannel('${c}')"># ${c}</div>`);
-document.getElementById("channels").innerHTML=html;
+let x=servers[s];
+let h="<h4>Kanallar</h4>";
+x.channels.forEach(c=>h+=`<div class='channel' onclick=loadChannel('${c}')># ${c}</div>`);
+document.getElementById("channels").innerHTML=h;
 }
 
-function loadChannel(name){
-currentChannel=name;
-let msgs=servers[currentServer].messages[name]||[];
-let html="";
-msgs.forEach(m=>{
-html+=`<div class='message'><b class='${m.role}'>${m.user}</b>: ${m.text}<div class='msg-actions'>⋮</div></div>`;
-});
-document.getElementById("messages").innerHTML=html;
+function loadChannel(n){
+c=n;
+let m=servers[s].messages[n]||[];
+let h="";
+m.forEach(x=>h+=`<div class='message'><b>${x.u}</b>: ${x.t}</div>`);
+document.getElementById("messages").innerHTML=h;
 }
 
-function sendMsg(){
-let v=document.getElementById("msgInput").value;
+function send(){
+let v=document.getElementById("msg").value;
 if(!v)return;
-servers[currentServer].messages[currentChannel].push({user:"Sen",role:"member",text:v});
-document.getElementById("msgInput").value="";
-loadChannel(currentChannel);
+servers[s].messages[c].push({u:"Sen",t:v});
+document.getElementById("msg").value="";
+loadChannel(c);
 }
 
 function renderUsers(){
-let u=servers[currentServer].users;
-let html="<h3>Kullanıcılar</h3>";
-u.forEach(x=>html+=`<div class='user ${x.role}'>${x.name}</div>`);
-document.getElementById("users").innerHTML=html;
+let u=servers[s].users;
+let h="<h4>Kullanıcılar</h4>";
+u.forEach(x=>h+=`<div class='user ${x.role}'>${x.name}</div>`);
+document.getElementById("users").innerHTML=h;
 }
 
-/* VIEW BUTTONS */
-function showServers(){loadServer(0)}
-function showDM(){alert("DM açıldı")}
-function showFriends(){alert("Arkadaşlar")}
-function showProfile(){alert("Profil")}
+function toggleChannels(){
+document.getElementById("channels").classList.toggle("open");
+}
 
-/* MODALS */
-function openCreateModal(){document.getElementById("createModal").style.display="flex"}
-function closeCreateModal(){document.getElementById("createModal").style.display="none"}
-function closeModal(){document.getElementById("modal").style.display="none"}
+function showDM(){alert("DM")}
+function showFriends(){alert("Friends")}
+function showProfile(){alert("Profile")}
+function openCreate(){alert("Create server")}
 
-renderServers();loadServer(0);
+renderServers();load(0);
 </script></body>
 </html>
