@@ -4,82 +4,65 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nexora App</title>
 <style>
-*{box-sizing:border-box}body{ margin:0; font-family:Arial; background:#1a0f2e; color:#fff; height:100vh; overflow:hidden; display:flex; }
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#1a0f2e;color:#fff;height:100vh;overflow:hidden;display:flex}.app{display:flex;width:100%;height:100%}
 
-/* LAYOUT WRAPPER */ .app{ display:flex; width:100%; height:100%; }
+/* LEFT BAR */ .leftbar{ width:78px; background:#120a24; display:flex; flex-direction:column; align-items:center; padding:10px 0; gap:10px; z-index:20; }
 
-/* LEFT BAR */ .leftbar{ width:78px; background:#120a24; display:flex; flex-direction:column; align-items:center; padding:10px 0; gap:10px; }
+.menuBtn{ width:44px;height:44px;border-radius:50%;background:#2a1748; display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px } .menuBtn:hover{background:#6a3df0}
 
-.menuBtns{ display:flex; flex-direction:column; gap:10px; }
+.servers{ flex:1; display:flex; flex-direction:column; align-items:center; gap:10px; overflow-y:auto }
 
-.menuBtn{ width:44px; height:44px; border-radius:50%; background:#2a1748; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; } .menuBtn:hover{background:#6a3df0}
+.server{ width:46px;height:46px;border-radius:50%;background:#2a1748; display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative }
 
-.servers{ flex:1; display:flex; flex-direction:column; align-items:center; gap:10px; overflow-y:auto; }
+.badge{position:absolute;bottom:-4px;right:-4px;background:#6a3df0;font-size:10px;padding:2px 4px;border-radius:10px}
 
-.server{ width:46px; height:46px; border-radius:50%; background:#2a1748; display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; position:relative; }
+.plus{ width:46px;height:46px;border-radius:50%;background:#6a3df0;display:flex;align-items:center;justify-content:center;cursor:pointer }
 
-.server:hover{background:#6a3df0}
+/* CHANNELS */ .channels{ width:240px; background:#2a1748; padding:10px; overflow-y:auto; transition:.3s; }
 
-.badge{ position:absolute; bottom:-4px; right:-4px; background:#6a3df0; font-size:10px; padding:2px 4px; border-radius:10px; }
+.channels.hide{ width:0; padding:0; overflow:hidden; }
 
-.plus{ width:46px; height:46px; border-radius:50%; background:#6a3df0; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; margin-top:10px; }
-
-/* CHANNEL PANEL */ .channels{ width:260px; background:#2a1748; padding:10px; overflow-y:auto; transition:.3s; }
-
-.channel{ padding:8px; border-radius:6px; cursor:pointer; margin:4px 0; }
+.channel{ padding:8px;border-radius:6px;cursor:pointer;margin:4px 0 }
 
 .channel:hover{background:#6a3df0}
 
 /* CHAT */ .chat{ flex:1; display:flex; flex-direction:column; }
 
-.messages{ flex:1; padding:12px; overflow-y:auto; }
+.messages{ flex:1; padding:12px; overflow-y:auto }
 
-.message{ background:rgba(255,255,255,0.03); padding:8px; border-radius:8px; margin-bottom:8px; }
+.message{ padding:8px;margin-bottom:6px;background:rgba(255,255,255,0.03);border-radius:8px }
 
-.input{ display:flex; padding:10px; gap:8px; background:#2a1748; }
+/* INPUT FIXED */ .input{ display:flex; padding:10px; gap:8px; background:#2a1748; }
 
-.input input{ flex:1; padding:12px; border:none; border-radius:8px; background:#1a0f2e; color:#fff; }
+.input input{ flex:1;padding:12px;border:none;border-radius:8px;background:#1a0f2e;color:#fff }
 
-.input button{ background:#6a3df0; border:none; color:#fff; padding:10px 14px; border-radius:8px; }
+.input button{ background:#6a3df0;border:none;color:#fff;padding:10px 14px;border-radius:8px }
 
-/* USERS */ .users{ width:220px; background:#2a1748; padding:10px; overflow-y:auto; }
+/* USERS RIGHT PANEL */ .users{ width:220px; background:#2a1748; padding:10px; overflow-y:auto }
 
 .user{padding:5px;margin:4px 0;border-radius:6px} .admin{color:#ff6bff} .member{color:#b084ff}
 
-/* MOBILE RESPONSIVE (FULL FIX) */ @media(max-width:900px){
+/* MOBILE FIX */ @media(max-width:900px){ .users{display:none} .channels{ position:fixed; left:78px; top:0; bottom:0; width:0; } .channels.open{ width:220px; } } </style>
 
-.leftbar{ width:60px; }
-
-.channels{ position:fixed; left:60px; top:0; bottom:0; width:0; overflow:hidden; transition:.3s; z-index:10; }
-
-.channels.open{ width:220px; }
-
-.users{ display:none; }
-
-.chat{ flex:1; }
-
-.menuBtn{ width:38px; height:38px; font-size:10px; }
-
-.server{ width:40px; height:40px; } }
-
-</style>
 </head>
-<body><div class="app"><!-- LEFT BAR --><div class="leftbar"><div class="menuBtns">
+<body><div class="app"><!-- LEFT --><div class="leftbar">
 <div class="menuBtn" onclick="toggleChannels()">☰</div>
-<div class="menuBtn" onclick="showDM()">DM</div>
-<div class="menuBtn" onclick="showFriends()">F</div>
-<div class="menuBtn" onclick="showProfile()">P</div>
-</div><div class="servers" id="servers"></div><div class="plus" onclick="openCreate()">+</div></div><!-- CHANNELS --><div class="channels" id="channels"></div><!-- CHAT --><div class="chat">
+<div class="menuBtn">DM</div>
+<div class="menuBtn">F</div>
+<div class="menuBtn">P</div><div class="servers" id="servers"></div>
+<div class="plus" onclick="alert('Sunucu ekle')">+</div>
+</div><!-- CHANNELS --><div class="channels" id="channels"></div><!-- CHAT --><div class="chat">
 <div class="messages" id="messages"></div>
 <div class="input">
 <input id="msg" placeholder="Mesaj yaz...">
-<button onclick="send()">Gönder</button>
+<button onclick="sendMsg()">Gönder</button>
 </div>
 </div><!-- USERS --><div class="users" id="users"></div></div><script>
 const servers=[
 {name:"Nexora",badge:3,channels:["genel","sohbet"],users:gen(12),messages:{"genel":[{u:"Admin",t:"Hoşgeldin"},{u:"Ali",t:"Selam"}]}},
-{name:"Oyun",badge:5,channels:["lol","valo"],users:gen(10),messages:{"lol":[{u:"Efe",t:"Rank?"}]}},
-{name:"Kod",badge:7,channels:["js","html"],users:gen(15),messages:{"js":[{u:"Dev",t:"JS iyi"}]}}
+{name:"Oyun",badge:5,channels:["lol"],users:gen(10),messages:{"lol":[{u:"Efe",t:"Rank?"}]}},
+{name:"Kod",badge:7,channels:["js"],users:gen(15),messages:{"js":[{u:"Dev",t:"JS iyi"}]}}
 ];
 
 let s=0,c="genel";
@@ -97,12 +80,13 @@ s=i;
 renderChannels();
 renderUsers();
 loadChannel(servers[i].channels[0]);
+if(window.innerWidth<900){document.getElementById("channels").classList.remove("open")}
 }
 
 function renderChannels(){
 let x=servers[s];
 let h="<h4>Kanallar</h4>";
-x.channels.forEach(c=>h+=`<div class='channel' onclick=loadChannel('${c}')># ${c}</div>`);
+x.channels.forEach(c=>h+=`<div class='channel' onclick="loadChannel('${c}')"># ${c}</div>`);
 document.getElementById("channels").innerHTML=h;
 }
 
@@ -112,9 +96,10 @@ let m=servers[s].messages[n]||[];
 let h="";
 m.forEach(x=>h+=`<div class='message'><b>${x.u}</b>: ${x.t}</div>`);
 document.getElementById("messages").innerHTML=h;
+if(window.innerWidth<900){document.getElementById("channels").classList.remove("open")}
 }
 
-function send(){
+function sendMsg(){
 let v=document.getElementById("msg").value;
 if(!v)return;
 servers[s].messages[c].push({u:"Sen",t:v});
@@ -124,7 +109,7 @@ loadChannel(c);
 
 function renderUsers(){
 let u=servers[s].users;
-let h="<h4>Kullanıcılar</h4>";
+let h="";
 u.forEach(x=>h+=`<div class='user ${x.role}'>${x.name}</div>`);
 document.getElementById("users").innerHTML=h;
 }
@@ -133,11 +118,6 @@ function toggleChannels(){
 document.getElementById("channels").classList.toggle("open");
 }
 
-function showDM(){alert("DM")}
-function showFriends(){alert("Friends")}
-function showProfile(){alert("Profile")}
-function openCreate(){alert("Create server")}
-
 renderServers();load(0);
 </script></body>
-</html>
+                                                    </html>
