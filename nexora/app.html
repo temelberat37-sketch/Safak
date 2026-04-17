@@ -1,0 +1,118 @@
+<!DOCTYPE html><html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexora App</title>
+<style>
+body{margin:0;font-family:Arial;background:#1a0f2e;color:#fff;display:flex;height:100vh}
+.sidebar{width:70px;background:#120a24;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:15px}
+.server{width:50px;height:50px;background:#2a1748;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.server:hover{background:#6a3df0}
+.main{flex:1;display:flex}
+.channels{width:220px;background:#2a1748;padding:10px}
+.channels h3{color:#b084ff}
+.channel{padding:8px;border-radius:6px;cursor:pointer}
+.channel:hover{background:#6a3df0}
+.chat{flex:1;display:flex;flex-direction:column}
+.messages{flex:1;padding:15px;overflow-y:auto}
+.message{margin-bottom:10px;position:relative}
+.message span{font-weight:bold;color:#b084ff}
+.msg-actions{position:absolute;right:0;top:0;cursor:pointer}
+.input{padding:10px;background:#2a1748}
+.input input{width:100%;padding:10px;border:none;border-radius:8px;background:#1a0f2e;color:#fff}
+.users{width:200px;background:#2a1748;padding:10px}
+.user{margin:5px 0}
+.admin{color:#ff6bff}
+.member{color:#b084ff}
+</style>
+</head>
+<body><div class="sidebar">
+  <div class="server">💬</div>
+  <div class="server" onclick="loadServer(0)">N</div>
+  <div class="server" onclick="loadServer(1)">G</div>
+  <div class="server" onclick="loadServer(2)">T</div>
+  <div class="server">+</div>
+</div><div class="main"><div class="channels" id="channels"></div><div class="chat">
+  <div class="messages" id="messages"></div>
+  <div class="input"><input placeholder="Mesaj yaz..."></div>
+</div><div class="users" id="users"></div></div><script>
+const servers=[
+{
+name:"Nexora Hub",
+channels:{
+text:["genel","duyurular"],
+voice:["Genel Ses"]
+},
+messages:{
+"genel":[
+{user:"Admin",role:"admin",text:"Hoşgeldiniz!"},
+{user:"Ali",role:"member",text:"Selam"}
+],
+"duyurular":[
+{user:"Admin",role:"admin",text:"Yeni güncelleme!"}
+]
+},
+users:[
+{name:"Admin",role:"admin"},
+{name:"Ali",role:"member"}
+]
+},
+{
+name:"Oyun Dünyası",
+channels:{text:["sohbet","oyun"],voice:["Lobby"]},
+messages:{"sohbet":[{user:"Efe",role:"member",text:"Valorant var mı?"}]},
+users:[{name:"Efe",role:"member"}]
+},
+{
+name:"Kod Topluluğu",
+channels:{text:["javascript","html"],voice:["Kod Odası"]},
+messages:{"javascript":[{user:"Dev",role:"admin",text:"JS öğreniyorum"}]},
+users:[{name:"Dev",role:"admin"}]
+}
+];
+
+let currentServer=0;
+let currentChannel="genel";
+
+function loadServer(i){
+currentServer=i;
+renderChannels();
+renderUsers();
+loadChannel(servers[i].channels.text[0]);
+}
+
+function renderChannels(){
+const s=servers[currentServer];
+let html=`<h3>${s.name}</h3><b>Metin Kanalları</b>`;
+s.channels.text.forEach(c=>{
+html+=`<div class="channel" onclick="loadChannel('${c}')"># ${c}</div>`;
+});
+html+=`<b>Ses Kanalları</b>`;
+s.channels.voice.forEach(v=>{
+html+=`<div class="channel">🔊 ${v}</div>`;
+});
+document.getElementById('channels').innerHTML=html;
+}
+
+function loadChannel(name){
+currentChannel=name;
+const msgs=servers[currentServer].messages[name]||[];
+let html="";
+msgs.forEach(m=>{
+html+=`<div class="message"><span class="${m.role}">${m.user}</span>: ${m.text}<div class="msg-actions">⋮</div></div>`;
+});
+document.getElementById('messages').innerHTML=html;
+}
+
+function renderUsers(){
+const u=servers[currentServer].users;
+let html="<h3>Kullanıcılar</h3>";
+u.forEach(x=>{
+html+=`<div class="user ${x.role}">${x.name}</div>`;
+});
+document.getElementById('users').innerHTML=html;
+}
+
+loadServer(0);
+</script></body>
+  </html>
