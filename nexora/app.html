@@ -1,118 +1,154 @@
+
 <!DOCTYPE html><html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nexora App</title>
 <style>
-body{margin:0;font-family:Arial;background:#1a0f2e;color:#fff;display:flex;height:100vh}
-.sidebar{width:70px;background:#120a24;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:15px}
-.server{width:50px;height:50px;background:#2a1748;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
-.server:hover{background:#6a3df0}
-.main{flex:1;display:flex}
-.channels{width:220px;background:#2a1748;padding:10px}
-.channels h3{color:#b084ff}
-.channel{padding:8px;border-radius:6px;cursor:pointer}
-.channel:hover{background:#6a3df0}
-.chat{flex:1;display:flex;flex-direction:column}
-.messages{flex:1;padding:15px;overflow-y:auto}
-.message{margin-bottom:10px;position:relative}
-.message span{font-weight:bold;color:#b084ff}
-.msg-actions{position:absolute;right:0;top:0;cursor:pointer}
-.input{padding:10px;background:#2a1748}
-.input input{width:100%;padding:10px;border:none;border-radius:8px;background:#1a0f2e;color:#fff}
-.users{width:200px;background:#2a1748;padding:10px}
-.user{margin:5px 0}
-.admin{color:#ff6bff}
-.member{color:#b084ff}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#1a0f2e;color:#fff;display:flex;height:100vh;overflow:hidden}/* SIDEBAR */ .sidebar{ width:80px; background:#120a24; display:flex; flex-direction:column; align-items:center; padding:10px 0; gap:12px; overflow-y:auto } .server{ width:50px;height:50px; background:#2a1748; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.2s; position:relative; user-select:none; } .server:hover{background:#6a3df0} .server:active{transform:scale(0.95)}
+
+.badge{ position:absolute; bottom:-3px;right:-3px; background:#6a3df0; font-size:10px; padding:2px 4px; border-radius:10px; }
+
+/* MAIN */ .main{flex:1;display:flex;overflow:hidden}
+
+.channels{ width:240px; background:#2a1748; padding:10px; overflow-y:auto } .channel{padding:8px;border-radius:6px;cursor:pointer;margin:4px 0} .channel:hover{background:#6a3df0}
+
+.chat{ flex:1; display:flex; flex-direction:column; }
+
+.messages{ flex:1; padding:15px; overflow-y:auto }
+
+.message{ margin-bottom:10px; padding:6px; border-radius:8px; position:relative; background:rgba(255,255,255,0.03) }
+
+.message:hover .msg-menu{display:block}
+
+.msg-menu{ position:absolute; right:8px;top:6px; display:none; cursor:pointer }
+
+.input{ padding:10px; background:#2a1748 }
+
+.input input{ width:100%;padding:12px;border:none;border-radius:8px;background:#1a0f2e;color:#fff }
+
+.users{ width:220px; background:#2a1748; padding:10px; overflow-y:auto }
+
+.user{padding:5px;border-radius:6px;margin:4px 0} .admin{color:#ff6bff} .member{color:#b084ff}
+
+/* MODAL */ .modal{ position:fixed; top:0;left:0; width:100%;height:100%; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center } .modal-content{ background:#2a1748; padding:20px; border-radius:10px; width:260px } .modal button{ width:100%;margin:5px 0;padding:10px;border:none;border-radius:6px;cursor:pointer;background:#6a3df0;color:#fff }
+
+/* MOBILE */ @media(max-width:900px){ .channels{display:none} .users{display:none} .sidebar{width:60px} }
+
 </style>
 </head>
-<body><div class="sidebar">
-  <div class="server">💬</div>
-  <div class="server" onclick="loadServer(0)">N</div>
-  <div class="server" onclick="loadServer(1)">G</div>
-  <div class="server" onclick="loadServer(2)">T</div>
-  <div class="server">+</div>
-</div><div class="main"><div class="channels" id="channels"></div><div class="chat">
-  <div class="messages" id="messages"></div>
-  <div class="input"><input placeholder="Mesaj yaz..."></div>
-</div><div class="users" id="users"></div></div><script>
+<body><!-- SIDEBAR --><div class="sidebar" id="serverList"></div><!-- MAIN --><div class="main"><div class="channels" id="channels"></div><div class="chat">
+<div class="messages" id="messages"></div>
+<div class="input"><input placeholder="Mesaj yaz..."></div>
+</div><div class="users" id="users"></div></div><!-- MODAL --><div class="modal" id="modal">
+<div class="modal-content">
+<h3 id="modalTitle">Sunucu</h3>
+<button>Sunucudan Çık</button>
+<button>Üye Sayısı: 14</button>
+<button>Aktif Üye: 6</button>
+<button onclick="closeModal()">Kapat</button>
+</div>
+</div><script>
 const servers=[
 {
-name:"Nexora Hub",
-channels:{
-text:["genel","duyurular"],
-voice:["Genel Ses"]
-},
+name:"Nexora Hub",badge:12,
+channels:["genel","sohbet","duyuru"],
+users:generateUsers(15),
 messages:{
 "genel":[
-{user:"Admin",role:"admin",text:"Hoşgeldiniz!"},
-{user:"Ali",role:"member",text:"Selam"}
-],
-"duyurular":[
-{user:"Admin",role:"admin",text:"Yeni güncelleme!"}
+{user:"Admin",role:"admin",text:"Nexora'ya hoşgeldiniz"},
+{user:"Ali",role:"member",text:"Selam!"},
+{user:"Zeynep",role:"member",text:"Nasılsınız?"}
 ]
-},
-users:[
-{name:"Admin",role:"admin"},
-{name:"Ali",role:"member"}
-]
+}
 },
 {
-name:"Oyun Dünyası",
-channels:{text:["sohbet","oyun"],voice:["Lobby"]},
-messages:{"sohbet":[{user:"Efe",role:"member",text:"Valorant var mı?"}]},
-users:[{name:"Efe",role:"member"}]
+name:"Oyun Dünyası",badge:8,
+channels:["valorant","lol","csgo"],
+users:generateUsers(12),
+messages:{"valorant":[{user:"Efe",role:"member",text:"Rank atıyor muyuz?"}]}
 },
 {
-name:"Kod Topluluğu",
-channels:{text:["javascript","html"],voice:["Kod Odası"]},
-messages:{"javascript":[{user:"Dev",role:"admin",text:"JS öğreniyorum"}]},
-users:[{name:"Dev",role:"admin"}]
+name:"Kod Topluluğu",badge:20,
+channels:["js","html","css"],
+users:generateUsers(18),
+messages:{"js":[{user:"Dev",role:"admin",text:"React öğreniyorum"}]}
 }
 ];
 
+function generateUsers(n){
+let arr=[];
+for(let i=0;i<n;i++){
+arr.push({name:"User"+i,role:i%5==0?"admin":"member"});
+}
+return arr;
+}
+
 let currentServer=0;
 let currentChannel="genel";
+
+function renderServers(){
+let html="";
+servers.forEach((s,i)=>{
+html+=`<div class='server' onclick='loadServer(${i})' oncontextmenu='openModal(${i});return false;'>${s.name[0]}<div class='badge'>${s.badge}</div></div>`;
+});
+document.getElementById("serverList").innerHTML=html;
+}
 
 function loadServer(i){
 currentServer=i;
 renderChannels();
 renderUsers();
-loadChannel(servers[i].channels.text[0]);
+loadChannel(servers[i].channels[0]);
 }
 
 function renderChannels(){
-const s=servers[currentServer];
-let html=`<h3>${s.name}</h3><b>Metin Kanalları</b>`;
-s.channels.text.forEach(c=>{
-html+=`<div class="channel" onclick="loadChannel('${c}')"># ${c}</div>`;
+let s=servers[currentServer];
+let html="<h3>Kanallar</h3>";
+s.channels.forEach(c=>{
+html+=`<div class='channel' onclick="loadChannel('${c}')"># ${c}</div>`;
 });
-html+=`<b>Ses Kanalları</b>`;
-s.channels.voice.forEach(v=>{
-html+=`<div class="channel">🔊 ${v}</div>`;
-});
-document.getElementById('channels').innerHTML=html;
+document.getElementById("channels").innerHTML=html;
 }
 
 function loadChannel(name){
 currentChannel=name;
-const msgs=servers[currentServer].messages[name]||[];
+let msgs=servers[currentServer].messages[name]||generateFake();
 let html="";
 msgs.forEach(m=>{
-html+=`<div class="message"><span class="${m.role}">${m.user}</span>: ${m.text}<div class="msg-actions">⋮</div></div>`;
+html+=`<div class='message'><b class='${m.role}'>${m.user}</b>: ${m.text}<div class='msg-menu'>⋮</div></div>`;
 });
-document.getElementById('messages').innerHTML=html;
+document.getElementById("messages").innerHTML=html;
+}
+
+function generateFake(){
+return[
+{user:"Ahmet",role:"member",text:"Selam"},
+{user:"Mehmet",role:"member",text:"Naber"},
+{user:"Elif",role:"member",text:"Discord gibi olmuş"}
+];
 }
 
 function renderUsers(){
-const u=servers[currentServer].users;
+let u=servers[currentServer].users;
 let html="<h3>Kullanıcılar</h3>";
 u.forEach(x=>{
-html+=`<div class="user ${x.role}">${x.name}</div>`;
+html+=`<div class='user ${x.role}'>${x.name}</div>`;
 });
-document.getElementById('users').innerHTML=html;
+document.getElementById("users").innerHTML=html;
 }
 
+function openModal(i){
+document.getElementById("modal").style.display="flex";
+document.getElementById("modalTitle").innerText=servers[i].name;
+}
+
+function closeModal(){
+document.getElementById("modal").style.display="none";
+}
+
+renderServers();
 loadServer(0);
 </script></body>
-  </html>
+                                                                </html>
